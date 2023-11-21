@@ -20,6 +20,7 @@ type BaseTeam struct {
 	Name             string    `json:"name" bson:"name" binding:"required,max=30"`
 	Category         string    `json:"category" bson:"category" binding:"required,teamcategory"`
 	Country          string    `json:"country" bson:"country" binding:"required,min=4"`
+	Province         string    `json:"province" bson:"province" binding:"required"`
 	City             string    `json:"city" bson:"city" binding:"required"`
 	Email            string    `json:"email" bson:"email" binding:"required,email"`
 	CreationDateTime time.Time `json:"creationDateTime" bson:"creationDateTime"`

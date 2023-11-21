@@ -13,16 +13,22 @@ import (
 )
 
 type AuthHandler struct {
-	authService    ports.AuthService
-	authMiddleware ports.AuthMiddleware
+	authService       ports.AuthService
+	authMiddleware    ports.AuthMiddleware
+	headersMiddleware ports.HeadersMiddleware
 }
 
 var _ ports.AuthHandler = (*AuthHandler)(nil)
 
-func NewAuthHandler(authService ports.AuthService, authMiddleware ports.AuthMiddleware) *AuthHandler {
+func NewAuthHandler(
+	authService ports.AuthService,
+	authMiddleware ports.AuthMiddleware,
+	headersMiddleWare ports.HeadersMiddleware,
+) *AuthHandler {
 	return &AuthHandler{
-		authService:    authService,
-		authMiddleware: authMiddleware,
+		authService:       authService,
+		authMiddleware:    authMiddleware,
+		headersMiddleware: headersMiddleWare,
 	}
 }
 
@@ -115,7 +121,7 @@ func (a *AuthHandler) RefreshTokens(c *gin.Context) {
 }
 
 func (a *AuthHandler) RegisterAuthRoutes(rg *gin.RouterGroup) {
-	authRoute := rg.Group("/auth")
+	authRoute := rg.Group("/auth", a.headersMiddleware.RequireApiKey)
 	authRoute.POST("/login", a.Login)
 	authRoute.POST("/refresh", a.authMiddleware.RequireRefresh, a.RefreshTokens)
 }

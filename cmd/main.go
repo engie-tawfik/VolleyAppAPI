@@ -28,9 +28,10 @@ func main() {
 	teamService := services.NewTeamService(teamRepository)
 	// Middlewares
 	authMiddleware := middlewares.NewAuthMiddleware()
+	headersMiddleware := middlewares.NewHeadersMiddleware()
 	// Handlers
-	authHandler := handlers.NewAuthHandler(authService, authMiddleware)
-	teamHandler := handlers.NewTeamHandler(teamService, authMiddleware)
+	authHandler := handlers.NewAuthHandler(authService, authMiddleware, headersMiddleware)
+	teamHandler := handlers.NewTeamHandler(teamService, authMiddleware, headersMiddleware)
 	// Server
 	ginServer := server.NewServer(authHandler, teamHandler)
 	ginServer.Initialize()

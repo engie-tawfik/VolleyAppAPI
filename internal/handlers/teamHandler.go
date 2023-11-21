@@ -13,17 +13,23 @@ import (
 )
 
 type TeamHandler struct {
-	teamService    ports.TeamService
-	authMiddleware ports.AuthMiddleware
+	teamService       ports.TeamService
+	authMiddleware    ports.AuthMiddleware
+	headersMiddleware ports.HeadersMiddleware
 }
 
 var _ ports.TeamHandler = (*TeamHandler)(nil)
 
-func NewTeamHandler(TeamService ports.TeamService, authMiddleware ports.AuthMiddleware) *TeamHandler {
+func NewTeamHandler(
+	TeamService ports.TeamService,
+	authMiddleware ports.AuthMiddleware,
+	headersMiddleware ports.HeadersMiddleware,
+) *TeamHandler {
 	domain.RegisterTeamValidators()
 	return &TeamHandler{
-		teamService:    TeamService,
-		authMiddleware: authMiddleware,
+		teamService:       TeamService,
+		authMiddleware:    authMiddleware,
+		headersMiddleware: headersMiddleware,
 	}
 }
 
@@ -82,7 +88,7 @@ func (t *TeamHandler) GetTeam(c *gin.Context) {
 }
 
 func (t *TeamHandler) RegisterTeamRoutes(rg *gin.RouterGroup) {
-	teamRoute := rg.Group("/teams")
+	teamRoute := rg.Group("/teams", t.headersMiddleware.RequireApiKey)
 	teamRoute.GET("", t.authMiddleware.RequireAuth, t.GetTeam)
 	teamRoute.POST("", t.CreateTeam)
 }

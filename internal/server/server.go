@@ -26,7 +26,7 @@ func NewServer(
 
 func (s *Server) Initialize() {
 	app := gin.Default()
-	basePath := app.Group("/volleyapp")
+	basePath := app.Group("/v1/volleyapp")
 	s.authHandler.RegisterAuthRoutes(basePath)
 	s.teamHandler.RegisterTeamRoutes(basePath)
 	app.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
