@@ -3,7 +3,6 @@ package domain
 import (
 	"fmt"
 	"time"
-	"unicode"
 
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
@@ -17,13 +16,14 @@ type LoginTeam struct {
 }
 
 type BaseTeam struct {
-	Name             string    `json:"name" bson:"name" binding:"required,max=30"`
-	Category         string    `json:"category" bson:"category" binding:"required,teamcategory"`
-	Country          string    `json:"country" bson:"country" binding:"required,min=4"`
-	Province         string    `json:"province" bson:"province" binding:"required"`
-	City             string    `json:"city" bson:"city" binding:"required"`
-	Email            string    `json:"email" bson:"email" binding:"required,email"`
-	CreationDateTime time.Time `json:"creationDateTime" bson:"creationDateTime"`
+	Name               string    `json:"name" bson:"name" binding:"required,max=30"`
+	Category           string    `json:"category" bson:"category" binding:"required,teamcategory"`
+	Country            string    `json:"country" bson:"country" binding:"required,min=4"`
+	Province           string    `json:"province" bson:"province" binding:"required"`
+	City               string    `json:"city" bson:"city" binding:"required"`
+	Email              string    `json:"email" bson:"email" binding:"required,email"`
+	CreationDateTime   time.Time `json:"creationDateTime" bson:"creationDateTime"`
+	LastUpdateDateTime time.Time `json:"lastUpdateDateTime" bson:"lastUpdateDateTime"`
 }
 
 type NewTeam struct {
@@ -72,31 +72,6 @@ var ValidTeamCategory validator.Func = func(fl validator.FieldLevel) bool {
 	category, ok := fl.Field().Interface().(string)
 	if ok {
 		if category == "Women" || category == "Men" {
-			return true
-		}
-	}
-	return false
-}
-
-var PasswordCheck validator.Func = func(fl validator.FieldLevel) bool {
-	password, ok := fl.Field().Interface().(string)
-	hasUpper := false
-	hasLower := false
-	hasNumber := false
-	hasSpace := false
-	for _, char := range password {
-		if unicode.IsUpper(char) {
-			hasUpper = true
-		} else if unicode.IsLower(char) {
-			hasLower = true
-		} else if unicode.IsDigit(char) {
-			hasNumber = true
-		} else if unicode.IsSpace(char) {
-			hasSpace = true
-		}
-	}
-	if ok {
-		if len(password) >= 12 && hasUpper && hasLower && hasNumber && !hasSpace {
 			return true
 		}
 	}

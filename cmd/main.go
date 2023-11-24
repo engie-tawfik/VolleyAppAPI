@@ -1,41 +1,93 @@
 package main
 
 import (
-	"context"
-	"volleyapp/config"
+	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+	"volleyapp/internal/controllers"
 	"volleyapp/internal/core/services"
-	"volleyapp/internal/database"
-	"volleyapp/internal/handlers"
+	"volleyapp/internal/infrastructure/config"
+	"volleyapp/internal/infrastructure/repositories"
 	"volleyapp/internal/middlewares"
-	"volleyapp/internal/repositories"
 	"volleyapp/internal/server"
+	"volleyapp/logger"
+
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
-func init() {
-	config.LoadEnvs()
-	config.InitLogger()
-	database.Connect()
-}
-
 func main() {
-	ctx := context.TODO()
+	logger.InitLogger()
+	defer logger.StopLogger()
 
-	// Repositories
-	authRepository := repositories.NewAuthRepository(database.Collection, ctx)
-	teamRepository := repositories.NewTeamRepository(database.Collection, ctx)
-	// Services
-	authService := services.NewAuthService(authRepository)
-	teamService := services.NewTeamService(teamRepository)
-	// Middlewares
+	if err := godotenv.Load(); err != nil {
+		logger.Logger.Error(".env file not found")
+	}
+
+	instance := gin.New()
+	instance.Use(gin.Recovery())
+
+	dbDriver := os.Getenv("DB_DRIVER")
+	dbUrl := fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_NAME"),
+	)
+
+	db, err := repositories.NewDB(
+		config.DatabaseConfig{
+			Driver:                   dbDriver,
+			Url:                      dbUrl,
+			ConnMaxLifetimeInMinutes: 3,
+			MaxOppenConns:            10,
+			MaxIdleConns:             1,
+		},
+	)
+	if err != nil {
+		logger.Logger.Error(
+			fmt.Sprintf(
+				"Failed to connect to Database. Error: %s",
+				err.Error(),
+			),
+		)
+	}
+
 	authMiddleware := middlewares.NewAuthMiddleware()
 	headersMiddleware := middlewares.NewHeadersMiddleware()
-	// Handlers
-	authHandler := handlers.NewAuthHandler(authService, authMiddleware, headersMiddleware)
-	teamHandler := handlers.NewTeamHandler(teamService, authMiddleware, headersMiddleware)
-	// Server
-	ginServer := server.NewServer(authHandler, teamHandler)
-	ginServer.Initialize()
 
-	defer database.Disconnect(ctx)
-	defer config.StopLogger()
+	authRepository := repositories.NewAuthRepository(db)
+	authService := services.NewAuthService(authRepository)
+	authController := controllers.NewAuthController(
+		instance,
+		authService,
+		authMiddleware,
+		headersMiddleware,
+	)
+	authController.InitAuthRoutes()
+
+	httpServer := server.NewHttpServer(
+		instance,
+		config.HttpServerConfig{
+			Port: 8080,
+		},
+	)
+
+	httpServer.Start()
+	defer httpServer.Stop()
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(
+		c,
+		os.Interrupt,
+		syscall.SIGHUP,
+		syscall.SIGINT,
+		syscall.SIGQUIT,
+		syscall.SIGTERM,
+	)
+	<-c
+	logger.Logger.Info("See you in next game!")
 }

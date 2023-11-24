@@ -1,39 +1,39 @@
-package handlers
+package controllers
 
 import (
 	"errors"
 	"fmt"
 	"net/http"
-	"volleyapp/config"
 	"volleyapp/internal/core/domain"
 	"volleyapp/internal/core/ports"
+	"volleyapp/logger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
 
-type TeamHandler struct {
+type TeamController struct {
 	teamService       ports.TeamService
 	authMiddleware    ports.AuthMiddleware
 	headersMiddleware ports.HeadersMiddleware
 }
 
-var _ ports.TeamHandler = (*TeamHandler)(nil)
+var _ ports.TeamController = (*TeamController)(nil)
 
 func NewTeamHandler(
 	TeamService ports.TeamService,
 	authMiddleware ports.AuthMiddleware,
 	headersMiddleware ports.HeadersMiddleware,
-) *TeamHandler {
+) *TeamController {
 	domain.RegisterTeamValidators()
-	return &TeamHandler{
+	return &TeamController{
 		teamService:       TeamService,
 		authMiddleware:    authMiddleware,
 		headersMiddleware: headersMiddleware,
 	}
 }
 
-func (t *TeamHandler) CreateTeam(c *gin.Context) {
+func (t *TeamController) CreateTeam(c *gin.Context) {
 	var team domain.NewTeam
 	response := domain.Response{
 		Message: "",
@@ -41,7 +41,7 @@ func (t *TeamHandler) CreateTeam(c *gin.Context) {
 	}
 	// Validate NewTeam data
 	if err := c.ShouldBindJSON(&team); err != nil {
-		config.Logger.Error("Unable to process Team")
+		logger.Logger.Error("Unable to process Team")
 		var ve validator.ValidationErrors
 		var errorMsg string
 		// Check for validation errors
@@ -54,40 +54,45 @@ func (t *TeamHandler) CreateTeam(c *gin.Context) {
 			}
 		}
 		response.Message = fmt.Sprintf("Unable to process team. %s", errorMsg)
-		config.Logger.Error("Validation error for team: " + errorMsg)
+		logger.Logger.Error("Validation error for team: " + errorMsg)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
-	config.Logger.Info("Request for CreateTeam with email " + team.Email)
-	config.Logger.Debug(fmt.Sprintf("Team data: %+v", team))
-	result := t.teamService.CreateTeam(team)
-	if result != "" {
-		response.Message = result
-		c.JSON(http.StatusBadRequest, response)
+	logger.Logger.Info("Request for CreateTeam with email " + team.Email)
+	logger.Logger.Debug(fmt.Sprintf("Team data: %+v", team))
+	_, err := t.teamService.CreateTeam(team)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "Internal server error")
 		return
 	}
-	response.Message = fmt.Sprintf("Team %s successfully registered.", team.Name)
+	response.Message = fmt.Sprintf(
+		"Team %s successfully registered",
+		team.Name,
+	)
 	c.JSON(http.StatusCreated, response)
 }
 
-func (t *TeamHandler) GetTeam(c *gin.Context) {
+func (t *TeamController) GetTeam(c *gin.Context) {
 	response := domain.Response{}
 	teamId, _ := c.Get("teamId")
-	config.Logger.Info("Request for GetTeam. TeamId: " + teamId.(string))
-	team := t.teamService.GetTeam(teamId.(string))
-	if team.Name == "" {
-		response.Message = "Team not found."
-		c.JSON(http.StatusBadRequest, response)
+	logger.Logger.Info("Request for GetTeam. TeamId: " + teamId.(string))
+	team, err := t.teamService.GetTeam(teamId.(string))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "Internal server error")
 		return
 	}
-	response.Message = "Team found."
+	response.Message = "Team found"
 	response.Data = team
-	config.Logger.Info("Team was found: " + team.Name)
-	config.Logger.Debug(fmt.Sprintf("Team data: %+v", team))
+	logger.Logger.Info("Team was found: " + team.Name)
+	logger.Logger.Debug(fmt.Sprintf("Team data: %+v", team))
 	c.JSON(http.StatusOK, response)
 }
 
-func (t *TeamHandler) RegisterTeamRoutes(rg *gin.RouterGroup) {
+func (t *TeamController) UpdateTeamInfo(c *gin.Context) {
+
+}
+
+func (t *TeamController) RegisterTeamRoutes(rg *gin.RouterGroup) {
 	teamRoute := rg.Group("/teams", t.headersMiddleware.RequireApiKey)
 	teamRoute.GET("", t.authMiddleware.RequireAuth, t.GetTeam)
 	teamRoute.POST("", t.CreateTeam)

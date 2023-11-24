@@ -7,18 +7,20 @@ import (
 )
 
 type TeamRepository interface {
-	CreateTeam(team domain.NewTeam) (string, bool)
-	GetTeam(teamId string) domain.Team
+	CreateTeam(team domain.NewTeam) (bool, error)
+	GetTeam(teamId string) (domain.Team, error)
 	CheckTeamExistence(email string) (bool, error)
 }
 
 type TeamService interface {
-	CreateTeam(domain.NewTeam) string
-	GetTeam(string) domain.Team
+	CreateTeam(domain.NewTeam) (bool, error)
+	GetTeam(string) (domain.Team, error)
+	UpdateTeamInfo(domain.BaseTeam) (bool, error)
 }
 
-type TeamHandler interface {
+type TeamController interface {
 	CreateTeam(c *gin.Context)
 	GetTeam(c *gin.Context)
+	UpdateTeamInfo(c *gin.Context)
 	RegisterTeamRoutes(rg *gin.RouterGroup)
 }

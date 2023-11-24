@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"volleyapp/config"
+	"volleyapp/logger"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -12,7 +12,7 @@ func Hash(password string) string {
 	var hashedPass string
 	genPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		config.Logger.Error("Error hashing password")
+		logger.Logger.Error("Error hashing password")
 		return hashedPass
 	}
 	hashedPass = string(genPassword)
@@ -28,7 +28,7 @@ func Verify(password, hashedPassword string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	if err != nil {
 		if err == bcrypt.ErrMismatchedHashAndPassword {
-			config.Logger.Info("Invalid password comparison error")
+			logger.Logger.Error("Invalid password comparison error")
 			return false
 		}
 		return false

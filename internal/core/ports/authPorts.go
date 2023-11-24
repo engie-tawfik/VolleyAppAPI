@@ -7,18 +7,21 @@ import (
 )
 
 type AuthRepository interface {
-	Login(email string) domain.LoginTeam
+	GetUserByEmail(email string) (domain.User, error)
+	SaveNewUser(user domain.User) (int, error)
 }
 
 type AuthService interface {
 	Login(email, password string) domain.AuthResponse
-	CreateTokens(teamId string) domain.AuthResponse
+	CreateTokens(userId int) domain.AuthResponse
+	CreateUser(user domain.User) (int, error)
 }
 
-type AuthHandler interface {
+type AuthController interface {
 	Login(c *gin.Context)
+	CreateUser(c *gin.Context)
 	RefreshTokens(c *gin.Context)
-	RegisterAuthRoutes(rg *gin.RouterGroup)
+	InitAuthRoutes()
 }
 
 type AuthMiddleware interface {
