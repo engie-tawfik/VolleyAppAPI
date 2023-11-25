@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"volleyapp/internal/core/domain"
@@ -46,11 +45,11 @@ func (a *AuthMiddleware) RequireAuth(c *gin.Context) {
 		tokenString, func(token *jwt.Token) (interface{}, error) {
 			// Validate the algorithm for token is what you expect
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				error := fmt.Errorf(
+				err := fmt.Errorf(
 					"[AUTH MIDDLEWARE] Unexpected signing method: %v",
 					token.Header["alg"],
 				)
-				return nil, error
+				return nil, err
 			}
 			return secretBytes, nil
 		})
@@ -90,12 +89,19 @@ func (a *AuthMiddleware) RequireRefresh(c *gin.Context) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Validate the algorithm for token is what you expect
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			err := fmt.Errorf(
+				"[AUTH MIDDLEWARE] Unexpected signing method: %v",
+				token.Header["alg"],
+			)
+			return nil, err
 		}
 		return secretBytes, nil
 	})
 	if err != nil {
-		log.Println("Error parsing token:", err)
+		errorMsg := fmt.Sprintf(
+			"[AUTH MIDDLEWARE] Error parsing token: %s", err,
+		)
+		logger.Logger.Error(errorMsg)
 		c.AbortWithStatusJSON(http.StatusUnauthorized, unauthorizedResponse)
 		return
 	}
@@ -105,7 +111,7 @@ func (a *AuthMiddleware) RequireRefresh(c *gin.Context) {
 		// Attach teamId to request
 		c.Set("userId", claims["sub"])
 	} else {
-		log.Println("Invalid token")
+		logger.Logger.Error("[AUTH MIDDLEWARE] Invalid token")
 		c.AbortWithStatusJSON(http.StatusUnauthorized, unauthorizedResponse)
 		return
 	}
