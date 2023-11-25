@@ -51,16 +51,20 @@ func (a *AuthController) Login(c *gin.Context) {
 	var authData domain.Auth
 
 	if err := c.ShouldBindJSON(&authData); err != nil {
-		errorMsg := fmt.Sprintf("[AUTH CONTROLLER] Error in Login: %s", err)
+		errorMsg := fmt.Sprintf("[AUTH CONTROLLER] Error in login: %s", err)
 		logger.Logger.Error(errorMsg)
 		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
-	logger.Logger.Info(fmt.Sprintf("[AUTH CONTROLLER] Login request: %s", authData.Email))
-	logger.Logger.Debug(fmt.Sprintf("[AUTH CONTROLLER] Login data: %s", authData))
+	logger.Logger.Info(
+		fmt.Sprintf("[AUTH CONTROLLER] Login request: %s", authData.Email),
+	)
+	logger.Logger.Debug(
+		fmt.Sprintf("[AUTH CONTROLLER] Login password: %s", authData.Password),
+	)
 	authResponse, err := a.authService.Login(authData.Email, authData.Password)
 	if err != nil {
-		errorMsg := fmt.Sprintf("[AUTH CONTROLLER] Error in Login: %s", err)
+		errorMsg := fmt.Sprintf("[AUTH CONTROLLER] Error in login: %s", err)
 		logger.Logger.Error(errorMsg)
 		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
@@ -94,7 +98,7 @@ func (a *AuthController) RefreshTokens(c *gin.Context) {
 	userId, _ := c.Get("userId")
 	logger.Logger.Info(
 		fmt.Sprintf(
-			"[AUTH CONTROLLER] RefreshTokens request userId: %v", userId,
+			"[AUTH CONTROLLER] Request for refresh tokens user id: %v", userId,
 		),
 	)
 	authResponse, err := a.authService.CreateTokens(int(userId.(float64)))
@@ -138,20 +142,22 @@ func (a *AuthController) CreateUser(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&newUser); err != nil {
-		errorMSg := fmt.Sprintf("[AUTH CONTROLLER] Unable to process User: %s", err)
+		errorMSg := fmt.Sprintf(
+			"[AUTH CONTROLLER] Unable to process user: %s", err,
+		)
 		logger.Logger.Error(errorMSg)
 		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
 	logger.Logger.Info(
 		fmt.Sprintf(
-			"[AUTH CONTROLLER] Request for CreateUser. User: %s",
+			"[AUTH CONTROLLER] Request for create user: %s",
 			newUser.Email,
 		),
 	)
 	logger.Logger.Debug(
 		fmt.Sprintf(
-			"[AUTH CONTROLLER] New User data: %s, %s",
+			"[AUTH CONTROLLER] New user data: %s, %s",
 			newUser.Email,
 			newUser.Password,
 		),
@@ -166,9 +172,9 @@ func (a *AuthController) CreateUser(c *gin.Context) {
 		return
 	}
 	logger.Logger.Debug(
-		fmt.Sprintf("[AUTH CONTROLLER] User created - New userId: %d", userId),
+		fmt.Sprintf("[AUTH CONTROLLER] User created with id: %d", userId),
 	)
-	response.Message = "User created"
+	response.Message = "User was successfully created"
 	response.Data = userId
 	c.JSON(http.StatusCreated, response)
 }

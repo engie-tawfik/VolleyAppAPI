@@ -5,33 +5,21 @@ import (
 
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type LoginTeam struct {
-	TeamId   primitive.ObjectID `json:"teamId"`
-	Password string             `json:"password"`
-	Email    string             `json:"email"`
+type TeamMainInfo struct {
+	TeamId         int       `json:"teamId"`
+	UserId         int       `json:"userId"`
+	Name           string    `json:"name" binding:"required,max=30"`
+	Category       string    `json:"category" binding:"required,teamcategory"`
+	Country        string    `json:"country" binding:"required,min=4"`
+	Province       string    `json:"province" binding:"required"`
+	City           string    `json:"city" binding:"required"`
+	CreationDate   time.Time `json:"creationDateTime"`
+	LastUpdateDate time.Time `json:"lastUpdateDateTime"`
 }
 
-type BaseTeam struct {
-	Name               string    `json:"name" binding:"required,max=30"`
-	Category           string    `json:"category" binding:"required,teamcategory"`
-	Country            string    `json:"country" binding:"required,min=4"`
-	Province           string    `json:"province" binding:"required"`
-	City               string    `json:"city" binding:"required"`
-	Email              string    `json:"email" binding:"required,email"`
-	CreationDateTime   time.Time `json:"creationDateTime"`
-	LastUpdateDateTime time.Time `json:"lastUpdateDateTime"`
-}
-
-type NewTeam struct {
-	BaseTeam
-	Password string `json:"password" binding:"required,passwordcheck"`
-	TeamData
-}
-
-type TeamData struct {
+type TeamGameData struct {
 	Games               []Game  `json:"teamGames"`
 	WonGames            int     `json:"wonGames"`
 	TotalGames          int     `json:"totalGames"`
@@ -63,8 +51,8 @@ type TeamData struct {
 }
 
 type Team struct {
-	BaseTeam
-	TeamData
+	TeamMainInfo TeamMainInfo `json:"teamMainInfo"`
+	TeamGameData TeamGameData `json:"teamGameData"`
 }
 
 var ValidTeamCategory validator.Func = func(fl validator.FieldLevel) bool {
@@ -81,6 +69,19 @@ var ValidTeamCategory validator.Func = func(fl validator.FieldLevel) bool {
 func RegisterTeamValidators() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v.RegisterValidation("teamcategory", ValidTeamCategory)
-		v.RegisterValidation("passwordcheck", PasswordCheck)
 	}
+}
+
+// RESPONSE STRUCTS
+
+type TeamSummary struct {
+	TeamMainInfo        TeamMainInfo `json:"teamMainInfo"`
+	WonGames            int          `json:"wonGames"`
+	TotalGames          int          `json:"totalGames"`
+	WonSets             int          `json:"teamSets"`
+	TotalSets           int          `json:"totalSets"`
+	AttackEffectiveness float64      `json:"attackEffectiveness"`
+	BlockEffectiveness  float64      `json:"blockEffectiveness"`
+	ServeEffectiveness  float64      `json:"serveEffectiveness"`
+	TotalEffectiveness  float64      `json:"totalEffectiveness"`
 }

@@ -8,7 +8,6 @@ import (
 	"time"
 	"volleyapp/internal/core/domain"
 	"volleyapp/internal/core/ports"
-	"volleyapp/logger"
 	"volleyapp/utils"
 
 	"github.com/golang-jwt/jwt"
@@ -32,7 +31,7 @@ func (a *AuthService) Login(
 	var response domain.AuthResponse
 	user, err := a.authRepository.GetUserByEmail(email)
 	if err != nil {
-		errorMsg := fmt.Sprintf("[AUTH SERVICE] Error in gogin: %s", err)
+		errorMsg := fmt.Sprintf("[AUTH SERVICE] Error in login: %s", err)
 		return response, fmt.Errorf(errorMsg)
 	}
 
@@ -93,10 +92,8 @@ func (a *AuthService) CreateUser(newUser domain.User) (int, error) {
 	newUser.LastUpdateDate = time.Now().In(loc)
 	userId, err := a.authRepository.SaveNewUser(newUser)
 	if err != nil {
-		logger.Logger.Error(fmt.Sprintf("%s", err))
-		return 0, fmt.Errorf(
-			"[AUTH SERVICE] Error in create user: %s", err,
-		)
+		errorMsg := fmt.Sprintf("[AUTH SERVICE] Error in create user: %s", err)
+		return 0, fmt.Errorf(errorMsg)
 	}
 	return userId, nil
 }

@@ -6,7 +6,6 @@ import (
 	"volleyapp/internal/core/domain"
 	"volleyapp/internal/core/ports"
 	"volleyapp/logger"
-	"volleyapp/utils"
 )
 
 type TeamService struct {
@@ -15,47 +14,36 @@ type TeamService struct {
 
 var _ ports.TeamService = (*TeamService)(nil)
 
-func NewTeamService(teamRepository ports.TeamRepository) *TeamService {
+func NewTeamService(repository ports.TeamRepository) *TeamService {
 	return &TeamService{
-		teamRepository: teamRepository,
+		teamRepository: repository,
 	}
 }
 
-func (t *TeamService) CreateTeam(team domain.NewTeam) (bool, error) {
-	teamExists, err := t.teamRepository.CheckTeamExistence(team.Email)
-	if err != nil {
-		errorMsg := fmt.Sprintf(
-			"TEAM SERVICE error CreateTeam/CheckTeamExistence: %s", err,
-		)
-		logger.Logger.Error(errorMsg)
-		return false, fmt.Errorf(errorMsg)
-	}
-	if teamExists {
-		errorMsg := "TEAM SERVICE error: team already registered in database"
-		logger.Logger.Error(errorMsg)
-		return false, fmt.Errorf(errorMsg)
-	}
-	hashedPass := utils.Hash(team.Password)
-	if hashedPass == "" {
-		errorMsg := "TEAM SERVICE error: unable to hash password"
-		logger.Logger.Error(errorMsg)
-		return false, fmt.Errorf(errorMsg)
-	}
-	team.Password = hashedPass
+func (t *TeamService) CreateTeam(newTeam domain.TeamMainInfo) (int, error) {
 	loc, _ := time.LoadLocation("America/Bogota")
-	team.CreationDateTime = time.Now().In(loc)
-	team.LastUpdateDateTime = time.Now().In(loc)
-	_, err = t.teamRepository.CreateTeam(team)
+	newTeam.UserId = 1
+	newTeam.CreationDate = time.Now().In(loc)
+	newTeam.LastUpdateDate = time.Now().In(loc)
+	teamId, err := t.teamRepository.SaveNewTeam(newTeam)
 	if err != nil {
 		errorMsg := fmt.Sprintf(
-			"TEAM SERVICE error CreateTeam/CreateTeam: %s",
-			err,
+			"[TEAM SERVICE] Error in create team: %s", err,
 		)
-		logger.Logger.Error(errorMsg)
-		return false, fmt.Errorf(errorMsg)
+		return 0, fmt.Errorf(errorMsg)
 	}
-	logger.Logger.Info("New Team successfully created")
-	return true, nil
+	return teamId, nil
+}
+
+func (t *TeamService) GetUserTeams(userId int) ([]domain.TeamSummary, error) {
+	userTeams, err := t.teamRepository.GetUserTeams(userId)
+	if err != nil {
+		errorMsg := fmt.Sprintf(
+			"[TEAM SERVICE] Error in get user teams: %s", err,
+		)
+		return []domain.TeamSummary{}, fmt.Errorf(errorMsg)
+	}
+	return userTeams, nil
 }
 
 func (t *TeamService) GetTeam(teamId string) (domain.Team, error) {
@@ -68,11 +56,12 @@ func (t *TeamService) GetTeam(teamId string) (domain.Team, error) {
 		logger.Logger.Error(errorMsg)
 		return team, fmt.Errorf(errorMsg)
 	}
-	loc, _ := time.LoadLocation("America/Bogota")
-	team.CreationDateTime = team.CreationDateTime.In(loc)
+	// These lines because mongo stored date in utc
+	// loc, _ := time.LoadLocation("America/Bogota")
+	// team.CreationDate = team.CreationDate.In(loc)
 	return team, nil
 }
 
-func (t *TeamService) UpdateTeamInfo(team domain.BaseTeam) (bool, error) {
+func (t *TeamService) UpdateTeamInfo(team domain.TeamMainInfo) (bool, error) {
 	return true, nil
 }
