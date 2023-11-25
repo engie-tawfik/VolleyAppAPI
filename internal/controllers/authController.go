@@ -7,16 +7,11 @@ import (
 	"strconv"
 	"volleyapp/internal/core/domain"
 	"volleyapp/internal/core/ports"
+	"volleyapp/internal/errors"
 	"volleyapp/logger"
 
 	"github.com/gin-gonic/gin"
 )
-
-var badRequestResponse = &domain.Response{
-	ErrorCode: http.StatusBadRequest,
-	Message:   "Bad request",
-	Data:      nil,
-}
 
 type AuthController struct {
 	gin               *gin.Engine
@@ -59,7 +54,7 @@ func (a *AuthController) Login(c *gin.Context) {
 		logger.Logger.Error(
 			fmt.Sprintf("[AUTH CONTROLLER] Error in Login: %s", err),
 		)
-		c.AbortWithStatusJSON(badRequestResponse.ErrorCode, badRequestResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
 	logger.Logger.Info(fmt.Sprintf("[AUTH CONTROLLER] Login request: %s", authData.Email))
@@ -69,7 +64,7 @@ func (a *AuthController) Login(c *gin.Context) {
 		logger.Logger.Error(
 			fmt.Sprintf("[AUTH CONTROLLER] Error in Login: %s", err),
 		)
-		c.AbortWithStatusJSON(http.StatusBadRequest, badRequestResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
 	tokenLife := os.Getenv("JWT_TOKEN_EXPIRE_MINUTES")
@@ -107,7 +102,7 @@ func (a *AuthController) RefreshTokens(c *gin.Context) {
 		logger.Logger.Error(
 			"[AUTH CONTROLLER] Error in RefreshTokens: tokens were not created",
 		)
-		c.AbortWithStatusJSON(badRequestResponse.ErrorCode, badRequestResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
 	tokenLife := os.Getenv("JWT_TOKEN_EXPIRE_MINUTES")
@@ -145,7 +140,7 @@ func (a *AuthController) CreateUser(c *gin.Context) {
 		logger.Logger.Error(
 			fmt.Sprintf("[AUTH CONTROLLER] Unable to process User: %s", err),
 		)
-		c.AbortWithStatusJSON(badRequestResponse.ErrorCode, badRequestResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
 	logger.Logger.Info(
@@ -159,7 +154,7 @@ func (a *AuthController) CreateUser(c *gin.Context) {
 		logger.Logger.Error(
 			fmt.Sprintf("[AUTH CONTROLLER] Error in create user: %s", err),
 		)
-		c.AbortWithStatusJSON(badRequestResponse.ErrorCode, badRequestResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
 	logger.Logger.Debug(

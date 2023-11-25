@@ -4,19 +4,13 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"volleyapp/internal/core/domain"
 	"volleyapp/internal/core/ports"
+	"volleyapp/internal/errors"
 	"volleyapp/logger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
-
-var unauthorizedResponse = domain.Response{
-	ErrorCode: http.StatusUnauthorized,
-	Message:   "Unauthorized.",
-	Data:      nil,
-}
 
 type AuthMiddleware struct {
 }
@@ -35,7 +29,7 @@ func (a *AuthMiddleware) RequireAuth(c *gin.Context) {
 			"[AUTH MIDDLEWARE] Error getting Access cookie: %s", err,
 		)
 		logger.Logger.Error(errorMsg)
-		c.AbortWithStatusJSON(http.StatusUnauthorized, unauthorizedResponse)
+		c.AbortWithStatusJSON(http.StatusUnauthorized, errors.UnauthorizedResponse)
 		return
 	}
 
@@ -58,7 +52,7 @@ func (a *AuthMiddleware) RequireAuth(c *gin.Context) {
 			"[AUTH MIDDLEWARE] Error parsing token: %s", err,
 		)
 		logger.Logger.Error(errorMsg)
-		c.AbortWithStatusJSON(http.StatusUnauthorized, unauthorizedResponse)
+		c.AbortWithStatusJSON(http.StatusUnauthorized, errors.UnauthorizedResponse)
 		return
 	}
 
@@ -68,7 +62,7 @@ func (a *AuthMiddleware) RequireAuth(c *gin.Context) {
 		c.Set("userId", claims["sub"])
 	} else {
 		logger.Logger.Error("[AUTH MIDDLEWARE] Invalid token")
-		c.AbortWithStatusJSON(http.StatusUnauthorized, unauthorizedResponse)
+		c.AbortWithStatusJSON(http.StatusUnauthorized, errors.UnauthorizedResponse)
 		return
 	}
 	c.Next()
@@ -80,7 +74,7 @@ func (a *AuthMiddleware) RequireRefresh(c *gin.Context) {
 	if err != nil {
 		errorMsg := fmt.Sprintf("[AUTH MIDDLEWARE] Error getting Refresh cookie: %s", err)
 		logger.Logger.Error(errorMsg)
-		c.AbortWithStatusJSON(http.StatusUnauthorized, unauthorizedResponse)
+		c.AbortWithStatusJSON(http.StatusUnauthorized, errors.UnauthorizedResponse)
 		return
 	}
 
@@ -102,7 +96,7 @@ func (a *AuthMiddleware) RequireRefresh(c *gin.Context) {
 			"[AUTH MIDDLEWARE] Error parsing token: %s", err,
 		)
 		logger.Logger.Error(errorMsg)
-		c.AbortWithStatusJSON(http.StatusUnauthorized, unauthorizedResponse)
+		c.AbortWithStatusJSON(http.StatusUnauthorized, errors.UnauthorizedResponse)
 		return
 	}
 
@@ -112,7 +106,7 @@ func (a *AuthMiddleware) RequireRefresh(c *gin.Context) {
 		c.Set("userId", claims["sub"])
 	} else {
 		logger.Logger.Error("[AUTH MIDDLEWARE] Invalid token")
-		c.AbortWithStatusJSON(http.StatusUnauthorized, unauthorizedResponse)
+		c.AbortWithStatusJSON(http.StatusUnauthorized, errors.UnauthorizedResponse)
 		return
 	}
 	c.Next()
