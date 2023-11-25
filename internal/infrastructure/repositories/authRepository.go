@@ -19,18 +19,12 @@ func NewAuthRepository(db ports.Database) *AuthRepository {
 }
 
 func (a *AuthRepository) GetUserByEmail(email string) (domain.User, error) {
-	// Get team based on email
 	var user domain.User
 	query := "SELECT * FROM users WHERE user_email = $1"
-	result, err := a.db.GetDB().Query(
+	result := a.db.GetDB().QueryRow(
 		query,
 		email,
 	)
-	if err != nil {
-		return user, fmt.Errorf(
-			"[DATABASE] Error in Insert into users: %s", err.Error(),
-		)
-	}
 	if err := result.Scan(
 		&user.UserId,
 		&user.IsActive,
@@ -40,15 +34,15 @@ func (a *AuthRepository) GetUserByEmail(email string) (domain.User, error) {
 		&user.LastUpdateDate,
 	); err != nil {
 		return user, fmt.Errorf(
-			"[DATABASE] Error in Insert into users: %s", err.Error(),
+			"[DATABASE] Error in get user by email: %s", err,
 		)
 	}
 	return user, nil
 }
 
 func (a *AuthRepository) SaveNewUser(newUser domain.User) (int, error) {
-	query := "INSERT INTO users (is_active, user_email, user_password, creation_date, last_update_date) VALUES($1, $2, $3, $4, $5)"
-	result, err := a.db.GetDB().Exec(
+	query := "INSERT INTO users (is_active, user_email, user_password, creation_date, last_update_date) VALUES($1, $2, $3, $4, $5) RETURNING user_id"
+	result := a.db.GetDB().QueryRow(
 		query,
 		newUser.IsActive,
 		newUser.Email,
@@ -56,15 +50,11 @@ func (a *AuthRepository) SaveNewUser(newUser domain.User) (int, error) {
 		newUser.CreationDate,
 		newUser.LastUpdateDate,
 	)
+	var newUserId int
+	err := result.Scan(&newUserId)
 	if err != nil {
 		return 0, fmt.Errorf(
-			"[DATABASE] Error in Insert into users: %s", err.Error(),
-		)
-	}
-	newUserId, err := result.LastInsertId()
-	if err != nil {
-		return 0, fmt.Errorf(
-			"[DATABASE] Error in LastInsertId: %s", err.Error(),
+			"[DATABASE] Error in save new User: %s", err,
 		)
 	}
 	return int(newUserId), nil

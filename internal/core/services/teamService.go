@@ -24,27 +24,22 @@ func NewTeamService(teamRepository ports.TeamRepository) *TeamService {
 func (t *TeamService) CreateTeam(team domain.NewTeam) (bool, error) {
 	teamExists, err := t.teamRepository.CheckTeamExistence(team.Email)
 	if err != nil {
-		errorMsg := fmt.Errorf(
-			"TEAM SERVICE error CreateTeam/CheckTeamExistence: %v",
-			err,
+		errorMsg := fmt.Sprintf(
+			"TEAM SERVICE error CreateTeam/CheckTeamExistence: %s", err,
 		)
-		logger.Logger.Error(errorMsg.Error())
-		return false, errorMsg
+		logger.Logger.Error(errorMsg)
+		return false, fmt.Errorf(errorMsg)
 	}
 	if teamExists {
-		errorMsg := fmt.Errorf(
-			"TEAM SERVICE error: team already registered in database",
-		)
-		logger.Logger.Info(errorMsg.Error())
-		return false, errorMsg
+		errorMsg := "TEAM SERVICE error: team already registered in database"
+		logger.Logger.Error(errorMsg)
+		return false, fmt.Errorf(errorMsg)
 	}
 	hashedPass := utils.Hash(team.Password)
 	if hashedPass == "" {
-		errorMsg := fmt.Errorf(
-			"TEAM SERVICE error: unable to hash password",
-		)
-		logger.Logger.Info(errorMsg.Error())
-		return false, errorMsg
+		errorMsg := "TEAM SERVICE error: unable to hash password"
+		logger.Logger.Error(errorMsg)
+		return false, fmt.Errorf(errorMsg)
 	}
 	team.Password = hashedPass
 	loc, _ := time.LoadLocation("America/Bogota")
@@ -52,12 +47,12 @@ func (t *TeamService) CreateTeam(team domain.NewTeam) (bool, error) {
 	team.LastUpdateDateTime = time.Now().In(loc)
 	_, err = t.teamRepository.CreateTeam(team)
 	if err != nil {
-		errorMsg := fmt.Errorf(
-			"TEAM SERVICE error CreateTeam/CreateTeam: %v",
+		errorMsg := fmt.Sprintf(
+			"TEAM SERVICE error CreateTeam/CreateTeam: %s",
 			err,
 		)
-		logger.Logger.Info(errorMsg.Error())
-		return false, errorMsg
+		logger.Logger.Error(errorMsg)
+		return false, fmt.Errorf(errorMsg)
 	}
 	logger.Logger.Info("New Team successfully created")
 	return true, nil
@@ -66,12 +61,12 @@ func (t *TeamService) CreateTeam(team domain.NewTeam) (bool, error) {
 func (t *TeamService) GetTeam(teamId string) (domain.Team, error) {
 	team, err := t.teamRepository.GetTeam(teamId)
 	if err != nil {
-		errorMsg := fmt.Errorf(
+		errorMsg := fmt.Sprintf(
 			"TEAM SERVICE error GetTeam/GetTeam: %v",
 			err,
 		)
-		logger.Logger.Info(errorMsg.Error())
-		return team, errorMsg
+		logger.Logger.Error(errorMsg)
+		return team, fmt.Errorf(errorMsg)
 	}
 	loc, _ := time.LoadLocation("America/Bogota")
 	team.CreationDateTime = team.CreationDateTime.In(loc)

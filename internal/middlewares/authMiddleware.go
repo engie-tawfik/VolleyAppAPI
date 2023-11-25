@@ -7,10 +7,17 @@ import (
 	"os"
 	"volleyapp/internal/core/domain"
 	"volleyapp/internal/core/ports"
+	"volleyapp/logger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
+
+var unauthorizedResponse = domain.Response{
+	ErrorCode: http.StatusUnauthorized,
+	Message:   "Unauthorized.",
+	Data:      nil,
+}
 
 type AuthMiddleware struct {
 }
@@ -22,30 +29,36 @@ func NewAuthMiddleware() *AuthMiddleware {
 }
 
 func (a *AuthMiddleware) RequireAuth(c *gin.Context) {
-	unauthorizedResponse := domain.Response{
-		Message: "Unauthorized.",
-		Data:    nil,
-	}
-
 	// Get cookie from request
 	tokenString, err := c.Cookie("Access")
 	if err != nil {
-		log.Println("Error getting Access cookie:", err)
+		errorMsg := fmt.Sprintf(
+			"[AUTH MIDDLEWARE] Error getting Access cookie: %s", err,
+		)
+		logger.Logger.Error(errorMsg)
 		c.AbortWithStatusJSON(http.StatusUnauthorized, unauthorizedResponse)
 		return
 	}
 
 	// Decode token
 	var secretBytes = []byte(os.Getenv("SECRET"))
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// Validate the algorithm for token is what you expect
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-		return secretBytes, nil
-	})
+	token, err := jwt.Parse(
+		tokenString, func(token *jwt.Token) (interface{}, error) {
+			// Validate the algorithm for token is what you expect
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				error := fmt.Errorf(
+					"[AUTH MIDDLEWARE] Unexpected signing method: %v",
+					token.Header["alg"],
+				)
+				return nil, error
+			}
+			return secretBytes, nil
+		})
 	if err != nil {
-		log.Println("Error parsing token:", err)
+		errorMsg := fmt.Sprintf(
+			"[AUTH MIDDLEWARE] Error parsing token: %s", err,
+		)
+		logger.Logger.Error(errorMsg)
 		c.AbortWithStatusJSON(http.StatusUnauthorized, unauthorizedResponse)
 		return
 	}
@@ -53,9 +66,9 @@ func (a *AuthMiddleware) RequireAuth(c *gin.Context) {
 	// Get token data
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		// Attach teamId to request
-		c.Set("teamId", claims["sub"])
+		c.Set("userId", claims["sub"])
 	} else {
-		log.Println("Invalid token")
+		logger.Logger.Error("[AUTH MIDDLEWARE] Invalid token")
 		c.AbortWithStatusJSON(http.StatusUnauthorized, unauthorizedResponse)
 		return
 	}
@@ -63,15 +76,11 @@ func (a *AuthMiddleware) RequireAuth(c *gin.Context) {
 }
 
 func (a *AuthMiddleware) RequireRefresh(c *gin.Context) {
-	unauthorizedResponse := domain.Response{
-		Message: "Unauthorized.",
-		Data:    nil,
-	}
-
 	// Get cookie from request
 	tokenString, err := c.Cookie("Refresh")
 	if err != nil {
-		log.Println("Error getting Access cookie:", err)
+		errorMsg := fmt.Sprintf("[AUTH MIDDLEWARE] Error getting Refresh cookie: %s", err)
+		logger.Logger.Error(errorMsg)
 		c.AbortWithStatusJSON(http.StatusUnauthorized, unauthorizedResponse)
 		return
 	}
@@ -94,7 +103,7 @@ func (a *AuthMiddleware) RequireRefresh(c *gin.Context) {
 	// Get token data
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		// Attach teamId to request
-		c.Set("teamId", claims["sub"])
+		c.Set("userId", claims["sub"])
 	} else {
 		log.Println("Invalid token")
 		c.AbortWithStatusJSON(http.StatusUnauthorized, unauthorizedResponse)

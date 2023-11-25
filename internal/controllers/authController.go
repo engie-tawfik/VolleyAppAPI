@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -11,7 +10,6 @@ import (
 	"volleyapp/logger"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 )
 
 var badRequestResponse = &domain.Response{
@@ -56,25 +54,22 @@ func (a *AuthController) InitAuthRoutes() {
 
 func (a *AuthController) Login(c *gin.Context) {
 	var authData domain.Auth
-	response := domain.Response{
-		Message: "",
-		Data:    nil,
-	}
+
 	if err := c.ShouldBindJSON(&authData); err != nil {
 		logger.Logger.Error(
-			fmt.Sprintf("[AUTH CONTROLLER] Error in Login: %s", err.Error()),
+			fmt.Sprintf("[AUTH CONTROLLER] Error in Login: %s", err),
 		)
 		c.AbortWithStatusJSON(badRequestResponse.ErrorCode, badRequestResponse)
 		return
 	}
-	logger.Logger.Info("Login request for " + authData.Email)
-	logger.Logger.Debug(fmt.Sprintf("Login data: %+v", authData))
-	authResponse := a.authService.Login(authData.Email, authData.Password)
-	if authResponse.AccessToken == "" || authResponse.Refreshtoken == "" {
+	logger.Logger.Info(fmt.Sprintf("[AUTH CONTROLLER] Login request: %s", authData.Email))
+	logger.Logger.Debug(fmt.Sprintf("[AUTH CONTROLLER] Login data: %s", authData))
+	authResponse, err := a.authService.Login(authData.Email, authData.Password)
+	if err != nil {
 		logger.Logger.Error(
-			fmt.Sprintf("[AUTH CONTROLLER] Error in Login: tokens were not created"),
+			fmt.Sprintf("[AUTH CONTROLLER] Error in Login: %s", err),
 		)
-		c.AbortWithStatusJSON(http.StatusBadRequest, response)
+		c.AbortWithStatusJSON(http.StatusBadRequest, badRequestResponse)
 		return
 	}
 	tokenLife := os.Getenv("JWT_TOKEN_EXPIRE_MINUTES")
@@ -100,22 +95,17 @@ func (a *AuthController) Login(c *gin.Context) {
 	)
 
 	c.Status(http.StatusOK)
-	return
 }
 
 func (a *AuthController) RefreshTokens(c *gin.Context) {
 	userId, _ := c.Get("userId")
 	logger.Logger.Info(
-		fmt.Sprintf(
-			"[AUTH CONTROLLER] RefreshTokens request userId: %d", userId,
-		),
+		fmt.Sprintf("[AUTH CONTROLLER] RefreshTokens request userId: %v", userId),
 	)
-	authResponse := a.authService.CreateTokens(userId.(int))
+	authResponse := a.authService.CreateTokens(int(userId.(float64)))
 	if authResponse.AccessToken == "" || authResponse.Refreshtoken == "" {
 		logger.Logger.Error(
-			fmt.Sprintf(
-				"[AUTH CONTROLLER] Error in RefreshTokens: tokens were not created",
-			),
+			"[AUTH CONTROLLER] Error in RefreshTokens: tokens were not created",
 		)
 		c.AbortWithStatusJSON(badRequestResponse.ErrorCode, badRequestResponse)
 		return
@@ -153,39 +143,27 @@ func (a *AuthController) CreateUser(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&newUser); err != nil {
 		logger.Logger.Error(
-			fmt.Sprintf("Unable to process User: %s", err.Error()),
+			fmt.Sprintf("[AUTH CONTROLLER] Unable to process User: %s", err),
 		)
-		var ve validator.ValidationErrors
-		// Check for validation errors
-		if errors.As(err, &ve) {
-			for _, fe := range ve {
-				errorMsg := domain.GetTeamErrorMsg(fe)
-				if errorMsg != "" {
-					logger.Logger.Error(
-						fmt.Sprintf("Validation error for User: %s", errorMsg),
-					)
-					break
-				}
-			}
-		}
-		response.Message = ("Bad request")
 		c.AbortWithStatusJSON(badRequestResponse.ErrorCode, badRequestResponse)
 		return
 	}
 	logger.Logger.Info(
-		fmt.Sprintf("Request for CreateUser. User: %s", newUser.Email),
+		fmt.Sprintf("[AUTH CONTROLLER] Request for CreateUser. User: %s", newUser.Email),
 	)
 	logger.Logger.Debug(
-		fmt.Sprintf("New User data: %s, %s", newUser.Email, newUser.Password),
+		fmt.Sprintf("[AUTH CONTROLLER] New User data: %s, %s", newUser.Email, newUser.Password),
 	)
 	userId, err := a.authService.CreateUser(newUser)
 	if err != nil {
-		logger.Logger.Error("Error in create user: " + err.Error())
+		logger.Logger.Error(
+			fmt.Sprintf("[AUTH CONTROLLER] Error in create user: %s", err),
+		)
 		c.AbortWithStatusJSON(badRequestResponse.ErrorCode, badRequestResponse)
 		return
 	}
 	logger.Logger.Debug(
-		fmt.Sprintf("[AUTH CONTROLLER] User created - New userId: ", userId),
+		fmt.Sprintf("[AUTH CONTROLLER] User created - New userId: %d", userId),
 	)
 	response.Message = "User created"
 	response.Data = userId

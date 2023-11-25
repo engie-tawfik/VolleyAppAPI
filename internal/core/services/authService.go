@@ -26,25 +26,21 @@ func NewAuthService(repository ports.AuthRepository) *AuthService {
 	}
 }
 
-func (a *AuthService) Login(email, password string) domain.AuthResponse {
+func (a *AuthService) Login(email, password string) (domain.AuthResponse, error) {
 	var response domain.AuthResponse
 	user, err := a.authRepository.GetUserByEmail(email)
 	if err != nil {
-		logger.Logger.Error(
-			fmt.Sprintf("[AUTH SERVICE] Error in Login: wrong credentials"),
-		)
-		return response
+		errorMsg := fmt.Sprintf("[AUTH SERVICE] Error in Login: %s", err)
+		return response, fmt.Errorf(errorMsg)
 	}
 
 	// Verify password
 	if passOk := utils.Verify(password, user.Password); !passOk {
-		logger.Logger.Error(
-			fmt.Sprintf("[AUTH SERVICE] Error in Login: wrong credentials"),
-		)
-		return response
+		errorMsg := "[AUTH SERVICE] Error in Login: can´t hash password"
+		return response, fmt.Errorf(errorMsg)
 	}
 
-	return a.CreateTokens(user.UserId)
+	return a.CreateTokens(user.UserId), nil
 }
 
 func (a *AuthService) CreateTokens(userId int) domain.AuthResponse {
@@ -85,11 +81,10 @@ func (a *AuthService) CreateUser(newUser domain.User) (int, error) {
 	newUser.LastUpdateDate = time.Now().In(loc)
 	userId, err := a.authRepository.SaveNewUser(newUser)
 	if err != nil {
-		logger.Logger.Error(err.Error())
+		logger.Logger.Error(fmt.Sprintf("%s", err))
 		return 0, fmt.Errorf(
-			"[AUTH SERVICE] Error in create user: %s", err.Error(),
+			"[AUTH SERVICE] Error in create user: %s", err,
 		)
 	}
-	fmt.Println(userId)
 	return userId, nil
 }

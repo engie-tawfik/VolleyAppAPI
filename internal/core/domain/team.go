@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin/binding"
@@ -10,62 +9,62 @@ import (
 )
 
 type LoginTeam struct {
-	TeamId   primitive.ObjectID `json:"teamId" bson:"_id"`
-	Password string             `json:"password" bson:"password"`
-	Email    string             `json:"email" bson:"email"`
+	TeamId   primitive.ObjectID `json:"teamId"`
+	Password string             `json:"password"`
+	Email    string             `json:"email"`
 }
 
 type BaseTeam struct {
-	Name               string    `json:"name" bson:"name" binding:"required,max=30"`
-	Category           string    `json:"category" bson:"category" binding:"required,teamcategory"`
-	Country            string    `json:"country" bson:"country" binding:"required,min=4"`
-	Province           string    `json:"province" bson:"province" binding:"required"`
-	City               string    `json:"city" bson:"city" binding:"required"`
-	Email              string    `json:"email" bson:"email" binding:"required,email"`
-	CreationDateTime   time.Time `json:"creationDateTime" bson:"creationDateTime"`
-	LastUpdateDateTime time.Time `json:"lastUpdateDateTime" bson:"lastUpdateDateTime"`
+	Name               string    `json:"name" binding:"required,max=30"`
+	Category           string    `json:"category" binding:"required,teamcategory"`
+	Country            string    `json:"country" binding:"required,min=4"`
+	Province           string    `json:"province" binding:"required"`
+	City               string    `json:"city" binding:"required"`
+	Email              string    `json:"email" binding:"required,email"`
+	CreationDateTime   time.Time `json:"creationDateTime"`
+	LastUpdateDateTime time.Time `json:"lastUpdateDateTime"`
 }
 
 type NewTeam struct {
-	BaseTeam `bson:",inline"`
-	Password string `json:"password" bson:"password" binding:"required,passwordcheck"`
-	TeamData `bson:",inline"`
+	BaseTeam
+	Password string `json:"password" binding:"required,passwordcheck"`
+	TeamData
 }
 
 type TeamData struct {
-	Games               []Game  `json:"teamGames" bson:"teamGames"`
-	WonGames            int     `json:"wonGames" bson:"wonGames"`
-	TotalGames          int     `json:"totalGames" bson:"totalGames"`
-	WonSets             int     `json:"teamSets" bson:"teamSets"`
-	TotalSets           int     `json:"totalSets" bson:"totalSets"`
-	AttackPoints        int     `json:"attackPoints" bson:"attackPoints"`
-	AttackNeutrals      int     `json:"attackNeutrals" bson:"attackNeutrals"`
-	AttackErrors        int     `json:"attackErrors" bson:"attackErrors"`
-	TotalAttacks        int     `json:"totalAttacks" bson:"totalAttacks"`
-	AttackEffectiveness float64 `json:"attackEffectiveness" bson:"attackEffectiveness"`
-	BlockPoints         int     `json:"blockPoints" bson:"blockPoints"`
-	BlockNeutrals       int     `json:"blockNeutrals" bson:"blockNeutrals"`
-	BlockErrors         int     `json:"blockErrors" bson:"blockErrors"`
-	TotalBlocks         int     `json:"totalBlocks" bson:"totalBlocks"`
-	BlockEffectiveness  float64 `json:"blockEffectiveness" bson:"blockEffectiveness"`
-	ServePoints         int     `json:"servePoints" bson:"servePoints"`
-	ServeNeutrals       int     `json:"serveNeutrals" bson:"serveNeutrals"`
-	ServeErrors         int     `json:"serveErrors" bson:"serveErrors"`
-	TotalServes         int     `json:"totalServes" bson:"totalServes"`
-	ServeEffectiveness  float64 `json:"serveEffectiveness" bson:"serveEffectiveness"`
-	OpponentErrors      int     `json:"opponentErrors" bson:"opponentErrors"`
-	TotalPoints         int     `json:"totalPoints" bson:"totalPoints"`
-	TotalActions        int     `json:"totalActions" bson:"totalActions"`
-	TotalEffectiveness  float64 `json:"totalEffectiveness" bson:"totalEffectiveness"`
-	OpponentAttacks     int     `json:"opponentAttacks" bson:"opponentAttacks"`
-	OpponentBlocks      int     `json:"opponentBlocks" bson:"opponentBlocks"`
-	OpponentServes      int     `json:"opponentServes" bson:"opponentServes"`
-	TotalErrors         int     `json:"totalErrors" bson:"totalErrors"`
+	Games               []Game  `json:"teamGames"`
+	WonGames            int     `json:"wonGames"`
+	TotalGames          int     `json:"totalGames"`
+	WonSets             int     `json:"teamSets"`
+	TotalSets           int     `json:"totalSets"`
+	AttackPoints        int     `json:"attackPoints"`
+	AttackNeutrals      int     `json:"attackNeutrals"`
+	AttackErrors        int     `json:"attackErrors"`
+	TotalAttacks        int     `json:"totalAttacks"`
+	AttackEffectiveness float64 `json:"attackEffectiveness"`
+	BlockPoints         int     `json:"blockPoints"`
+	BlockNeutrals       int     `json:"blockNeutrals"`
+	BlockErrors         int     `json:"blockErrors"`
+	TotalBlocks         int     `json:"totalBlocks"`
+	BlockEffectiveness  float64 `json:"blockEffectiveness"`
+	ServePoints         int     `json:"servePoints"`
+	ServeNeutrals       int     `json:"serveNeutrals"`
+	ServeErrors         int     `json:"serveErrors"`
+	TotalServes         int     `json:"totalServes"`
+	ServeEffectiveness  float64 `json:"serveEffectiveness"`
+	OpponentErrors      int     `json:"opponentErrors"`
+	TotalPoints         int     `json:"totalPoints"`
+	TotalActions        int     `json:"totalActions"`
+	TotalEffectiveness  float64 `json:"totalEffectiveness"`
+	OpponentAttacks     int     `json:"opponentAttacks"`
+	OpponentBlocks      int     `json:"opponentBlocks"`
+	OpponentServes      int     `json:"opponentServes"`
+	TotalErrors         int     `json:"totalErrors"`
 }
 
 type Team struct {
-	BaseTeam `bson:",inline"`
-	TeamData `bson:",inline"`
+	BaseTeam
+	TeamData
 }
 
 var ValidTeamCategory validator.Func = func(fl validator.FieldLevel) bool {
@@ -76,16 +75,6 @@ var ValidTeamCategory validator.Func = func(fl validator.FieldLevel) bool {
 		}
 	}
 	return false
-}
-
-func GetTeamErrorMsg(fe validator.FieldError) string {
-	var msg string
-	if fe.Tag() == "required" {
-		msg = fmt.Sprintf("%s is missing in team's data.", fe.Field())
-	} else if fe.Tag() == "min" || fe.Tag() == "max" || fe.Tag() == "email" || fe.Tag() == "teamcategory" || fe.Tag() == "passwordcheck" {
-		msg = fmt.Sprintf("Invalid value for %s", fe.Field())
-	}
-	return msg
 }
 
 // Registers custom validators in models for JSON binding

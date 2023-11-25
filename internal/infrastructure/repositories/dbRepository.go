@@ -49,10 +49,3 @@ func (d database) Close() error {
 func (d database) GetDB() *sql.DB {
 	return d.DB
 }
-
-// "host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-// "localhost",
-// 5432,
-// "VOLLEY_APP_USER",
-// "VOLLEY_APP_PASS",
-// "VOLLEY_APP_BD",

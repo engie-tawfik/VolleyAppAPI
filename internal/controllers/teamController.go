@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"volleyapp/internal/core/domain"
@@ -9,7 +8,6 @@ import (
 	"volleyapp/logger"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 )
 
 type TeamController struct {
@@ -42,19 +40,8 @@ func (t *TeamController) CreateTeam(c *gin.Context) {
 	// Validate NewTeam data
 	if err := c.ShouldBindJSON(&team); err != nil {
 		logger.Logger.Error("Unable to process Team")
-		var ve validator.ValidationErrors
-		var errorMsg string
-		// Check for validation errors
-		if errors.As(err, &ve) {
-			for _, fe := range ve {
-				errorMsg = domain.GetTeamErrorMsg(fe)
-				if errorMsg != "" {
-					break
-				}
-			}
-		}
-		response.Message = fmt.Sprintf("Unable to process team. %s", errorMsg)
-		logger.Logger.Error("Validation error for team: " + errorMsg)
+		response.Message = fmt.Sprintf("Unable to process team. %s", err)
+		// logger.Logger.Error("Validation error for team: " + err)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}

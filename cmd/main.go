@@ -51,7 +51,7 @@ func main() {
 		logger.Logger.Error(
 			fmt.Sprintf(
 				"Failed to connect to Database. Error: %s",
-				err.Error(),
+				err,
 			),
 		)
 	}

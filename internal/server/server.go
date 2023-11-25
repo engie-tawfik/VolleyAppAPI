@@ -49,7 +49,7 @@ func (h *httpServer) Start() {
 			log.Fatalf(
 				"Failed to start HttpServer in port %d. Error: %s",
 				h.Port,
-				err.Error(),
+				err,
 			)
 		}
 	}()
@@ -63,14 +63,6 @@ func (h *httpServer) Stop() {
 	defer cancel()
 
 	if err := h.server.Shutdown(ctx); err != nil {
-		log.Fatalf("Server forced to shutdown. Error: %s", err.Error())
+		log.Fatalf("Server forced to shutdown. Error: %s", err)
 	}
 }
-
-// func (s *Server) Initialize() {
-// 	app := gin.Default()
-// 	basePath := app.Group("/v1/volleyapp")
-// 	s.authController.RegisterAuthRoutes(basePath)
-// 	s.teamController.RegisterTeamRoutes(basePath)
-// 	app.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
-// }

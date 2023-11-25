@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"fmt"
 	"time"
 	"unicode"
 
@@ -41,16 +40,6 @@ var PasswordCheck validator.Func = func(fl validator.FieldLevel) bool {
 		}
 	}
 	return false
-}
-
-func GetUserErrorMsg(fe validator.FieldError) string {
-	var msg string
-	if fe.Tag() == "required" {
-		msg = fmt.Sprintf("%s is missing in team's data.", fe.Field())
-	} else if fe.Tag() == "email" || fe.Tag() == "passwordcheck" {
-		msg = fmt.Sprintf("Invalid value for %s", fe.Field())
-	}
-	return msg
 }
 
 // Registers custom validators in models for JSON binding
