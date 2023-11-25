@@ -51,9 +51,8 @@ func (a *AuthController) Login(c *gin.Context) {
 	var authData domain.Auth
 
 	if err := c.ShouldBindJSON(&authData); err != nil {
-		logger.Logger.Error(
-			fmt.Sprintf("[AUTH CONTROLLER] Error in Login: %s", err),
-		)
+		errorMsg := fmt.Sprintf("[AUTH CONTROLLER] Error in Login: %s", err)
+		logger.Logger.Error(errorMsg)
 		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
@@ -61,9 +60,8 @@ func (a *AuthController) Login(c *gin.Context) {
 	logger.Logger.Debug(fmt.Sprintf("[AUTH CONTROLLER] Login data: %s", authData))
 	authResponse, err := a.authService.Login(authData.Email, authData.Password)
 	if err != nil {
-		logger.Logger.Error(
-			fmt.Sprintf("[AUTH CONTROLLER] Error in Login: %s", err),
-		)
+		errorMsg := fmt.Sprintf("[AUTH CONTROLLER] Error in Login: %s", err)
+		logger.Logger.Error(errorMsg)
 		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
@@ -95,13 +93,16 @@ func (a *AuthController) Login(c *gin.Context) {
 func (a *AuthController) RefreshTokens(c *gin.Context) {
 	userId, _ := c.Get("userId")
 	logger.Logger.Info(
-		fmt.Sprintf("[AUTH CONTROLLER] RefreshTokens request userId: %v", userId),
+		fmt.Sprintf(
+			"[AUTH CONTROLLER] RefreshTokens request userId: %v", userId,
+		),
 	)
-	authResponse := a.authService.CreateTokens(int(userId.(float64)))
-	if authResponse.AccessToken == "" || authResponse.Refreshtoken == "" {
-		logger.Logger.Error(
-			"[AUTH CONTROLLER] Error in RefreshTokens: tokens were not created",
+	authResponse, err := a.authService.CreateTokens(int(userId.(float64)))
+	if err != nil {
+		errorMsg := fmt.Sprintf(
+			"[AUTH CONTROLLER] Error in RefreshTokens: %s", err,
 		)
+		logger.Logger.Error(errorMsg)
 		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
@@ -137,23 +138,30 @@ func (a *AuthController) CreateUser(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&newUser); err != nil {
-		logger.Logger.Error(
-			fmt.Sprintf("[AUTH CONTROLLER] Unable to process User: %s", err),
-		)
+		errorMSg := fmt.Sprintf("[AUTH CONTROLLER] Unable to process User: %s", err)
+		logger.Logger.Error(errorMSg)
 		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
 	logger.Logger.Info(
-		fmt.Sprintf("[AUTH CONTROLLER] Request for CreateUser. User: %s", newUser.Email),
+		fmt.Sprintf(
+			"[AUTH CONTROLLER] Request for CreateUser. User: %s",
+			newUser.Email,
+		),
 	)
 	logger.Logger.Debug(
-		fmt.Sprintf("[AUTH CONTROLLER] New User data: %s, %s", newUser.Email, newUser.Password),
+		fmt.Sprintf(
+			"[AUTH CONTROLLER] New User data: %s, %s",
+			newUser.Email,
+			newUser.Password,
+		),
 	)
 	userId, err := a.authService.CreateUser(newUser)
 	if err != nil {
-		logger.Logger.Error(
-			fmt.Sprintf("[AUTH CONTROLLER] Error in create user: %s", err),
+		errorMsg := fmt.Sprintf(
+			"[AUTH CONTROLLER] Error in create user: %s", err,
 		)
+		logger.Logger.Error(errorMsg)
 		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
