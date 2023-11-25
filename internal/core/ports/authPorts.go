@@ -13,7 +13,7 @@ type AuthRepository interface {
 
 type AuthService interface {
 	Login(email, password string) (domain.AuthResponse, error)
-	CreateTokens(userId int) domain.AuthResponse
+	CreateTokens(userId int) (domain.AuthResponse, error)
 	CreateUser(user domain.User) (int, error)
 }
 

@@ -6,6 +6,7 @@ import (
 	"os"
 	"volleyapp/internal/core/domain"
 	"volleyapp/internal/core/ports"
+	"volleyapp/logger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,10 +26,12 @@ func (h *HeadersMiddleware) RequireApiKey(c *gin.Context) {
 	var headers HeadersMiddleware
 	err := c.ShouldBindHeader(&headers)
 	if err != nil || !passValidations(headers) {
+		logger.Logger.Error("[HEADERS MIDDLEWARE] Bad headers in request")
 		log.Println("Bad headers in request")
 		badRequestResponse := domain.Response{
-			Message: "Bad request",
-			Data:    nil,
+			ErrorCode: http.StatusBadRequest,
+			Message:   "Bad request",
+			Data:      nil,
 		}
 		c.AbortWithStatusJSON(http.StatusBadRequest, badRequestResponse)
 		return
@@ -38,15 +41,12 @@ func (h *HeadersMiddleware) RequireApiKey(c *gin.Context) {
 
 func passValidations(h HeadersMiddleware) bool {
 	if h.HereComesTheBoom == "" || h.AppArena == "" {
-		log.Println("Empty headers")
 		return false
 	}
 	if h.AppArena != os.Getenv("WEBAPP") {
-		log.Println("Bad App-Arena")
 		return false
 	}
 	if h.HereComesTheBoom != os.Getenv("MOCK_API_KEY") {
-		log.Println("Bad Here-Comes-The-Boom")
 		return false
 	}
 	return true

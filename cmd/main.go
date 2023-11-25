@@ -69,6 +69,16 @@ func main() {
 	)
 	authController.InitAuthRoutes()
 
+	teamRepository := repositories.NewTeamRepository(db)
+	teamService := services.NewTeamService(teamRepository)
+	teamController := controllers.NewTeamController(
+		instance,
+		teamService,
+		authMiddleware,
+		headersMiddleware,
+	)
+	teamController.InitTeamRoutes()
+
 	httpServer := server.NewHttpServer(
 		instance,
 		config.HttpServerConfig{

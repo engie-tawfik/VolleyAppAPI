@@ -54,7 +54,7 @@ func (a *AuthRepository) SaveNewUser(newUser domain.User) (int, error) {
 	err := result.Scan(&newUserId)
 	if err != nil {
 		return 0, fmt.Errorf(
-			"[DATABASE] Error in save new User: %s", err,
+			"[DATABASE] Error in save new user: %s", err,
 		)
 	}
 	return int(newUserId), nil
