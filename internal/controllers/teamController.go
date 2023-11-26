@@ -23,14 +23,14 @@ var _ ports.TeamController = (*TeamController)(nil)
 
 func NewTeamController(
 	gin *gin.Engine,
-	TeamService ports.TeamService,
+	teamService ports.TeamService,
 	authMiddleware ports.AuthMiddleware,
 	headersMiddleware ports.HeadersMiddleware,
 ) *TeamController {
 	domain.RegisterTeamValidators()
 	return &TeamController{
 		gin:               gin,
-		teamService:       TeamService,
+		teamService:       teamService,
 		authMiddleware:    authMiddleware,
 		headersMiddleware: headersMiddleware,
 	}
@@ -52,7 +52,7 @@ func (t *TeamController) CreateTeam(c *gin.Context) {
 	var newTeam domain.TeamMainInfo
 	if err := c.ShouldBindJSON(&newTeam); err != nil {
 		errorMSg := fmt.Sprintf(
-			"[TEAM CONTROLLER] Unable to process Team: %s", err,
+			"[TEAM CONTROLLER] Unable to process team: %s", err,
 		)
 		logger.Logger.Error(errorMSg)
 		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)

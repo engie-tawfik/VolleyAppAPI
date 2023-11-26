@@ -7,14 +7,14 @@ import (
 )
 
 type AuthRepository interface {
-	GetUserByEmail(email string) (domain.User, error)
-	SaveNewUser(user domain.User) (int, error)
+	GetUserByEmail(string) (domain.User, error)
+	SaveNewUser(domain.User) (int, error)
 }
 
 type AuthService interface {
-	Login(email, password string) (domain.AuthResponse, error)
-	CreateTokens(userId int) (domain.AuthResponse, error)
-	CreateUser(user domain.User) (int, error)
+	Login(string, string) (domain.AuthResponse, error)
+	CreateTokens(int) (domain.AuthResponse, error)
+	CreateUser(domain.User) (int, error)
 }
 
 type AuthController interface {

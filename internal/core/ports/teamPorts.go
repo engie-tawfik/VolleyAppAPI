@@ -7,15 +7,15 @@ import (
 )
 
 type TeamRepository interface {
-	SaveNewTeam(team domain.TeamMainInfo) (int, error)
-	GetUserTeams(userId int) ([]domain.TeamSummary, error)
-	GetTeam(teamId string) (domain.Team, error)
-	CheckTeamExistence(email string) (bool, error)
+	SaveNewTeam(domain.TeamMainInfo) (int, error)
+	GetUserTeams(int) ([]domain.TeamSummary, error)
+	GetTeam(string) (domain.Team, error)
+	CheckTeamExistence(string) (bool, error)
 }
 
 type TeamService interface {
 	CreateTeam(domain.TeamMainInfo) (int, error)
-	GetUserTeams(userId int) ([]domain.TeamSummary, error)
+	GetUserTeams(int) ([]domain.TeamSummary, error)
 	GetTeam(string) (domain.Team, error)
 	UpdateTeamInfo(domain.TeamMainInfo) (bool, error)
 }

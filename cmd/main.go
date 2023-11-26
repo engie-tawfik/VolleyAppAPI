@@ -79,6 +79,16 @@ func main() {
 	)
 	teamController.InitTeamRoutes()
 
+	gameRepository := repositories.NewGameRepository(db)
+	gameService := services.NewGameService(gameRepository)
+	gameController := controllers.NewGameController(
+		instance,
+		gameService,
+		authMiddleware,
+		headersMiddleware,
+	)
+	gameController.InitGameRoutes()
+
 	httpServer := server.NewHttpServer(
 		instance,
 		config.HttpServerConfig{

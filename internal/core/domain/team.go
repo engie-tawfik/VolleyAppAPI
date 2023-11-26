@@ -20,7 +20,6 @@ type TeamMainInfo struct {
 }
 
 type TeamGameData struct {
-	Games               []Game  `json:"teamGames"`
 	WonGames            int     `json:"wonGames"`
 	TotalGames          int     `json:"totalGames"`
 	WonSets             int     `json:"teamSets"`
