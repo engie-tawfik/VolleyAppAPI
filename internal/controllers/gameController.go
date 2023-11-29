@@ -46,7 +46,7 @@ func (g *GameController) InitGameRoutes() {
 }
 
 func (g *GameController) CreateGame(c *gin.Context) {
-	var newGame domain.NewGame
+	var newGame domain.GameMainInfo
 	if err := c.ShouldBindJSON(&newGame); err != nil {
 		errorMSg := fmt.Sprintf(
 			"[GAME CONTROLLER] Unable to process game: %s", err,
@@ -69,9 +69,15 @@ func (g *GameController) CreateGame(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
+	logger.Logger.Info(
+		fmt.Sprintf(
+			"[GAME CONTROLLER] Game was created with id: %d",
+			gameId,
+		),
+	)
 	response := domain.Response{
 		Message: "Game successfully created",
-		Data:    gameId,
+		Data:    map[string]int{"gameId": gameId},
 	}
 	c.JSON(http.StatusCreated, response)
 }

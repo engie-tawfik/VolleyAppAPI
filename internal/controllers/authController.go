@@ -90,7 +90,7 @@ func (a *AuthController) Login(c *gin.Context) {
 		true,
 		true,
 	)
-
+	logger.Logger.Info("[AUTH CONTROLLER] Tokens were set in cookies")
 	c.Status(http.StatusOK)
 }
 
@@ -131,16 +131,12 @@ func (a *AuthController) RefreshTokens(c *gin.Context) {
 		true,
 		true,
 	)
+	logger.Logger.Info("[AUTH CONTROLLER] Tokens were set in cookies")
 	c.Status(http.StatusOK)
 }
 
 func (a *AuthController) CreateUser(c *gin.Context) {
 	var newUser domain.User
-	response := domain.Response{
-		Message: "",
-		Data:    nil,
-	}
-
 	if err := c.ShouldBindJSON(&newUser); err != nil {
 		errorMSg := fmt.Sprintf(
 			"[AUTH CONTROLLER] Unable to process user: %s", err,
@@ -174,7 +170,15 @@ func (a *AuthController) CreateUser(c *gin.Context) {
 	logger.Logger.Debug(
 		fmt.Sprintf("[AUTH CONTROLLER] User created with id: %d", userId),
 	)
-	response.Message = "User was successfully created"
-	response.Data = userId
+	logger.Logger.Info(
+		fmt.Sprintf(
+			"[AUTH CONTROLLER] User was created with id: %d",
+			userId,
+		),
+	)
+	response := domain.Response{
+		Message: "User was successfully created",
+		Data:    map[string]int{"userId": userId},
+	}
 	c.JSON(http.StatusCreated, response)
 }

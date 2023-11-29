@@ -89,6 +89,16 @@ func main() {
 	)
 	gameController.InitGameRoutes()
 
+	setRepository := repositories.NewSetRepository(db)
+	setService := services.NewSetService(setRepository)
+	setController := controllers.NewSetController(
+		instance,
+		setService,
+		authMiddleware,
+		headersMiddleware,
+	)
+	setController.InitSetRoutes()
+
 	httpServer := server.NewHttpServer(
 		instance,
 		config.HttpServerConfig{

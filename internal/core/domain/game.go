@@ -43,7 +43,7 @@ type Game struct {
 	LastUpdateDate      time.Time `json:"lastUpdateDate"`
 }
 
-type NewGame struct {
+type GameMainInfo struct {
 	TeamId         int       `json:"teamId"`
 	GameDate       time.Time `json:"gameDateTime"`
 	IsActive       bool      `json:"isActive"`

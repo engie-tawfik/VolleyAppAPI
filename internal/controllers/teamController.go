@@ -77,6 +77,12 @@ func (t *TeamController) CreateTeam(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
+	logger.Logger.Info(
+		fmt.Sprintf(
+			"[TEAM CONTROLLER] Team was created with id: %d",
+			teamId,
+		),
+	)
 	response := domain.Response{
 		Message: fmt.Sprintf(
 			"Team %s successfully registered", newTeam.Name,
@@ -106,9 +112,15 @@ func (t *TeamController) GetUserTeams(c *gin.Context) {
 	if len(userTeams) == 0 {
 		responseMsg = "No teams found for user"
 	}
+	logger.Logger.Info(
+		fmt.Sprintf(
+			"[TEAM CONTROLLER] User teams: %v",
+			userTeams,
+		),
+	)
 	response := domain.Response{
 		Message: responseMsg,
-		Data:    userTeams,
+		Data:    map[string][]domain.TeamSummary{"userTeams": userTeams},
 	}
 	c.JSON(http.StatusOK, response)
 }

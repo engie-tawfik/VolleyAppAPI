@@ -18,7 +18,7 @@ func NewGameRepository(db ports.Database) *GameRepository {
 	}
 }
 
-func (g *GameRepository) SaveNewGame(newGame domain.NewGame) (int, error) {
+func (g *GameRepository) SaveNewGame(newGame domain.GameMainInfo) (int, error) {
 	query := "INSERT INTO game (team_id, game_date, is_active, game_country, game_province, game_city, opponent, last_update_date) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING game_id"
 	result := g.db.GetDB().QueryRow(
 		query,

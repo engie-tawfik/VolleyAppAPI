@@ -21,9 +21,9 @@ type TeamService interface {
 }
 
 type TeamController interface {
-	CreateTeam(c *gin.Context)
-	GetUserTeams(c *gin.Context)
-	GetTeam(c *gin.Context)
-	UpdateTeamInfo(c *gin.Context)
+	CreateTeam(*gin.Context)
+	GetUserTeams(*gin.Context)
+	GetTeam(*gin.Context)
+	UpdateTeamInfo(*gin.Context)
 	InitTeamRoutes()
 }

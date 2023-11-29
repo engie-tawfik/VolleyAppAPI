@@ -19,7 +19,7 @@ func NewGameService(repository ports.GameRepository) *GameService {
 	}
 }
 
-func (g *GameService) CreateGame(newGame domain.NewGame) (int, error) {
+func (g *GameService) CreateGame(newGame domain.GameMainInfo) (int, error) {
 	loc, _ := time.LoadLocation("America/Bogota")
 	newGame.GameDate = time.Now().In(loc)
 	newGame.LastUpdateDate = time.Now().In(loc)

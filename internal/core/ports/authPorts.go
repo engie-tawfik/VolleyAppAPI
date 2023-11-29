@@ -18,13 +18,13 @@ type AuthService interface {
 }
 
 type AuthController interface {
-	Login(c *gin.Context)
-	CreateUser(c *gin.Context)
-	RefreshTokens(c *gin.Context)
+	Login(*gin.Context)
+	CreateUser(*gin.Context)
+	RefreshTokens(*gin.Context)
 	InitAuthRoutes()
 }
 
 type AuthMiddleware interface {
-	RequireAuth(c *gin.Context)
-	RequireRefresh(c *gin.Context)
+	RequireAuth(*gin.Context)
+	RequireRefresh(*gin.Context)
 }
