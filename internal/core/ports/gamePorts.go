@@ -8,13 +8,16 @@ import (
 
 type GameRepository interface {
 	SaveNewGame(domain.GameMainInfo) (int, error)
+	FinishGame(int, domain.GameMainInfo) (int, error)
 }
 
 type GameService interface {
 	CreateGame(domain.GameMainInfo) (int, error)
+	FinishGame(int) (int, error)
 }
 
 type GameController interface {
 	CreateGame(*gin.Context)
+	FinishGame(*gin.Context)
 	InitGameRoutes()
 }

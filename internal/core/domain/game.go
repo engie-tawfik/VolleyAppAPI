@@ -50,7 +50,7 @@ type GameMainInfo struct {
 	GameCountry    string    `json:"gameCountry"`
 	GameProvince   string    `json:"gameProvince"`
 	GameCity       string    `json:"gameCity"`
-	Opponent       string    `json:"gameOpponent"`
+	Opponent       string    `json:"opponent"`
 	LastUpdateDate time.Time `json:"lastUpdateDate"`
 }
 

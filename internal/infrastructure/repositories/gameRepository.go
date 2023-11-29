@@ -39,3 +39,25 @@ func (g *GameRepository) SaveNewGame(newGame domain.GameMainInfo) (int, error) {
 	}
 	return int(newGameId), nil
 }
+
+func (g *GameRepository) FinishGame(gameId int, game domain.GameMainInfo) (int, error) {
+	query := "UPDATE game SET is_active = $1, last_update_date = $2 WHERE game_id = $3"
+	result, err := g.db.GetDB().Exec(
+		query,
+		game.IsActive,
+		game.LastUpdateDate,
+		gameId,
+	)
+	if err != nil {
+		return 0, fmt.Errorf(
+			"[DATABASE] Error in finish game: %s", err,
+		)
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return 0, fmt.Errorf(
+			"[DATABASE] Error in finish game: %s", err,
+		)
+	}
+	return int(rowsAffected), nil
+}

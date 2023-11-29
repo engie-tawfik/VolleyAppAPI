@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"volleyapp/internal/core/domain"
 	"volleyapp/internal/core/ports"
 	"volleyapp/internal/errors"
@@ -43,6 +44,7 @@ func (g *GameController) InitGameRoutes() {
 		g.authMiddleware.RequireAuth,
 	)
 	gameRoute.POST("/create", g.CreateGame)
+	gameRoute.PUT("/finish/:gameId", g.FinishGame)
 }
 
 func (g *GameController) CreateGame(c *gin.Context) {
@@ -78,6 +80,44 @@ func (g *GameController) CreateGame(c *gin.Context) {
 	response := domain.Response{
 		Message: "Game successfully created",
 		Data:    map[string]int{"gameId": gameId},
+	}
+	c.JSON(http.StatusCreated, response)
+}
+
+func (g *GameController) FinishGame(c *gin.Context) {
+	gameId, err := strconv.ParseInt(c.Param("gameId"), 10, 64)
+	if err != nil {
+		errorMSg := fmt.Sprintf(
+			"[GAME CONTROLLER] Unable to process game id: %s", err,
+		)
+		logger.Logger.Error(errorMSg)
+		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
+		return
+	}
+	logger.Logger.Info(
+		fmt.Sprintf(
+			"[GAME CONTROLLER] Request for finish game: %v", gameId,
+		),
+	)
+	rowsAffected, err := g.gameService.FinishGame(int(gameId))
+	if err != nil {
+		errorMsg := fmt.Sprintf(
+			"[GAME CONTROLLER] Error in finish game: %s", err,
+		)
+		logger.Logger.Error(errorMsg)
+		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
+		return
+	}
+	logger.Logger.Info(
+		fmt.Sprintf(
+			"[GAME CONTROLLER] Game was finished with id: %d - %d rows affected",
+			gameId,
+			rowsAffected,
+		),
+	)
+	response := domain.Response{
+		Message: "Game successfully finished",
+		Data:    nil,
 	}
 	c.JSON(http.StatusCreated, response)
 }

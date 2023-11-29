@@ -33,3 +33,19 @@ func (g *GameService) CreateGame(newGame domain.GameMainInfo) (int, error) {
 	}
 	return gameId, nil
 }
+
+func (g *GameService) FinishGame(gameId int) (int, error) {
+	loc, _ := time.LoadLocation("America/Bogota")
+	game := domain.GameMainInfo{
+		LastUpdateDate: time.Now().In(loc),
+		IsActive:       false,
+	}
+	rowsAffected, err := g.gameRepository.FinishGame(gameId, game)
+	if err != nil {
+		errorMsg := fmt.Sprintf(
+			"[GAME SERVICE] Error in finish game: %s", err,
+		)
+		return 0, fmt.Errorf(errorMsg)
+	}
+	return rowsAffected, nil
+}
