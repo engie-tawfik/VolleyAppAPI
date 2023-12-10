@@ -9,6 +9,7 @@ import (
 type SetRepository interface {
 	SaveNewSet(domain.SetMainInfo) (int, error)
 	FinishSet(int, domain.SetMainInfo) (int, error)
+	SaveRally(domain.Rally) (int, error)
 }
 
 type SetService interface {

@@ -65,3 +65,9 @@ type SetSummary struct {
 	SetWinner       string    `json:"setWinner"`
 	LastUpdate      time.Time `json:"lastUpdate"`
 }
+
+type Rally struct {
+	SetId    int       `json:"setId"`
+	Action   string    `json:"action"`
+	DateTime time.Time `json:"dateTime"`
+}

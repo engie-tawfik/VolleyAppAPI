@@ -49,3 +49,16 @@ func (s *SetService) FinishSet(setId int) (int, error) {
 	}
 	return rowsAffected, nil
 }
+
+func (s *SetService) PlaySet(rally domain.Rally) (int, error) {
+	loc, _ := time.LoadLocation("America/Bogota")
+	rally.DateTime = time.Now().In(loc)
+	rowsAffected, err := s.setRepository.SaveRally(rally)
+	if err != nil {
+		errorMsg := fmt.Sprintf(
+			"[SET SERVICE] Error in play set: %s", err,
+		)
+		return 0, fmt.Errorf(errorMsg)
+	}
+	return rowsAffected, nil
+}
