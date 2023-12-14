@@ -28,6 +28,7 @@ func NewSetController(
 	authMiddleware ports.AuthMiddleware,
 	headersMiddleware ports.HeadersMiddleware,
 ) *SetController {
+	domain.RegisterSetValidators()
 	return &SetController{
 		gin:               gin,
 		setService:        setService,
@@ -45,6 +46,7 @@ func (s *SetController) InitSetRoutes() {
 	)
 	setRoute.POST("/create", s.CreateSet)
 	setRoute.PUT("/finish/:setId", s.FinishSet)
+	setRoute.POST("/play", s.PlaySet)
 }
 
 func (s *SetController) CreateSet(c *gin.Context) {
@@ -117,6 +119,44 @@ func (s *SetController) FinishSet(c *gin.Context) {
 	)
 	response := domain.Response{
 		Message: "Set successfully finished",
+		Data:    nil,
+	}
+	c.JSON(http.StatusCreated, response)
+}
+
+func (s *SetController) PlaySet(c *gin.Context) {
+	var rally domain.Rally
+	if err := c.ShouldBindJSON(&rally); err != nil {
+		errorMSg := fmt.Sprintf(
+			"[SET CONTROLLER] Unable to process rally: %s", err,
+		)
+		logger.Logger.Error(errorMSg)
+		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
+		return
+	}
+	logger.Logger.Info(
+		fmt.Sprintf(
+			"[SET CONTROLLER] Request for play set: %v", rally,
+		),
+	)
+	rowsAffected, err := s.setService.PlaySet(rally)
+	if err != nil {
+		errorMsg := fmt.Sprintf(
+			"[SET CONTROLLER] Error in play set: %s", err,
+		)
+		logger.Logger.Error(errorMsg)
+		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
+		return
+	}
+	logger.Logger.Info(
+		fmt.Sprintf(
+			"[SET CONTROLLER] Rally was saved for set with id: %d - %d rows affected",
+			rally.SetId,
+			rowsAffected,
+		),
+	)
+	response := domain.Response{
+		Message: "Rally successfully saved",
 		Data:    nil,
 	}
 	c.JSON(http.StatusCreated, response)

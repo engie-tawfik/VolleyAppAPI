@@ -9,12 +9,14 @@ import (
 type SetRepository interface {
 	SaveNewSet(domain.SetMainInfo) (int, error)
 	FinishSet(int, domain.SetMainInfo) (int, error)
-	SaveRally(domain.Rally) (int, error)
+	GetSet(int) (domain.Set, error)
+	SaveRally(domain.Set) (int, error)
 }
 
 type SetService interface {
 	CreateSet(domain.SetMainInfo) (int, error)
 	FinishSet(int) (int, error)
+	PlaySet(domain.Rally) (int, error)
 }
 
 type SetController interface {

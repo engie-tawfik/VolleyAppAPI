@@ -15,20 +15,20 @@ type Game struct {
 	Opponent            string    `json:"gameOpponent"`
 	TeamSets            int       `json:"teamSets"`
 	OpponentSets        int       `json:"opponentSets"`
+	TotalAttacks        int       `json:"totalAttacks"`
 	AttackPoints        int       `json:"attackPoints"`
 	AttackNeutrals      int       `json:"attackNeutrals"`
 	AttackErrors        int       `json:"attackErrors"`
-	TotalAttacks        int       `json:"totalAttacks"`
 	AttackEffectiveness float64   `json:"attackEffectiveness"`
+	TotalBlocks         int       `json:"totalBlocks"`
 	BlockPoints         int       `json:"blockPoints"`
 	BlockNeutrals       int       `json:"blockNeutrals"`
 	BlockErrors         int       `json:"blockErrors"`
-	TotalBlocks         int       `json:"totalBlocks"`
 	BlockEffectiveness  float64   `json:"blockEffectiveness"`
+	TotalServes         int       `json:"totalServes"`
 	ServePoints         int       `json:"servePoints"`
 	ServeNeutrals       int       `json:"serveNeutrals"`
 	ServeErrors         int       `json:"serveErrors"`
-	TotalServes         int       `json:"totalServes"`
 	ServeEffectiveness  float64   `json:"serveEffectiveness"`
 	OpponentErrors      int       `json:"opponentErrors"`
 	TotalPoints         int       `json:"totalPoints"`

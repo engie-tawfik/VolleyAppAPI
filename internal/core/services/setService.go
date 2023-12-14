@@ -3,8 +3,10 @@ package services
 import (
 	"fmt"
 	"time"
+	"volleyapp/internal/core/constants"
 	"volleyapp/internal/core/domain"
 	"volleyapp/internal/core/ports"
+	"volleyapp/logger"
 )
 
 type SetService struct {
@@ -35,6 +37,7 @@ func (s *SetService) CreateSet(newSet domain.SetMainInfo) (int, error) {
 }
 
 func (s *SetService) FinishSet(setId int) (int, error) {
+	// TODO get set fields required to set winner
 	loc, _ := time.LoadLocation("America/Bogota")
 	set := domain.SetMainInfo{
 		LastUpdate: time.Now().In(loc),
@@ -47,13 +50,71 @@ func (s *SetService) FinishSet(setId int) (int, error) {
 		)
 		return 0, fmt.Errorf(errorMsg)
 	}
+	// TODO call gameService.PlayGame
 	return rowsAffected, nil
 }
 
 func (s *SetService) PlaySet(rally domain.Rally) (int, error) {
+	forward := true
+	fail := func(err error) (int, error) {
+		return 0, fmt.Errorf("[SET SERVICE] Error in play set: %s", err)
+	}
+	set, err := s.setRepository.GetSet(rally.SetId)
+	if err != nil {
+		return fail(err)
+	}
+	logger.Logger.Debug(fmt.Sprintf("[SET SERVICE] Set from db: %v", set))
+
+	if rally.Action == constants.RollBack {
+		if len(set.GameActions) > 0 {
+			forward = false
+			rally.Action = set.GameActions[len(set.GameActions)-1]
+			set.GameActions = set.GameActions[:len(set.GameActions)-1]
+		} else {
+			return fail(fmt.Errorf("no registered actions in set"))
+		}
+	} else {
+		set.GameActions = append(set.GameActions, rally.Action)
+	}
+
+	switch rally.Action {
+	case constants.AttackPoint:
+		set.AttackPoint(forward)
+	case constants.AttackNeutral:
+		set.AttackNeutral(forward)
+	case constants.AttackError:
+		set.AttackError(forward)
+	case constants.OpponentAttack:
+		set.OpponentAttack(forward)
+	case constants.BlockPoint:
+		set.BlockPoint(forward)
+	case constants.BlockNeutral:
+		set.BlockNeutral(forward)
+	case constants.BlockError:
+		set.BlockError(forward)
+	case constants.OpponentBlock:
+		set.OpponentBlock(forward)
+	case constants.ServePoint:
+		set.ServePoint(forward)
+	case constants.ServeNeutral:
+		set.ServeNeutral(forward)
+	case constants.ServeError:
+		set.ServeError(forward)
+	case constants.OpponentService:
+		set.OpponentServe(forward)
+	case constants.Error:
+		set.Error(forward)
+	case constants.OpponentError:
+		set.OpponentError(forward)
+	}
+	set.UpdateStats()
+
 	loc, _ := time.LoadLocation("America/Bogota")
-	rally.DateTime = time.Now().In(loc)
-	rowsAffected, err := s.setRepository.SaveRally(rally)
+	set.LastUpdate = time.Now().In(loc)
+	logger.Logger.Debug(fmt.Sprintf("[SET SERVICE] Set to be saved: %v", set))
+	fmt.Println("SET AFTER SERVICE ----", set)
+	rowsAffected, err := s.setRepository.SaveRally(set)
+	// TODO update game and team stats
 	if err != nil {
 		errorMsg := fmt.Sprintf(
 			"[SET SERVICE] Error in play set: %s", err,
