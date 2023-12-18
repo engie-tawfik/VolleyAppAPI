@@ -9,6 +9,7 @@ import (
 type GameRepository interface {
 	SaveNewGame(domain.GameMainInfo) (int, error)
 	FinishGame(int, domain.GameMainInfo) (int, error)
+	GetTeamsNames(int) (domain.GameTeamsNames, error)
 }
 
 type GameService interface {

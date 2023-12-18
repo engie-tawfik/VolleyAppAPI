@@ -4,6 +4,51 @@ import (
 	"time"
 )
 
+type GameMainInfo struct {
+	TeamId         int       `json:"teamId"`
+	GameDate       time.Time `json:"gameDateTime"`
+	IsActive       bool      `json:"isActive"`
+	GameCountry    string    `json:"gameCountry"`
+	GameProvince   string    `json:"gameProvince"`
+	GameCity       string    `json:"gameCity"`
+	Opponent       string    `json:"opponent"`
+	TeamSets       int       `json:"teamSets"`
+	OpponentSets   int       `json:"opponentSets"`
+	LastUpdateDate time.Time `json:"lastUpdateDate"`
+}
+
+type GameTeamsNames struct {
+	TeamName     string `json:"teamName"`
+	OpponentName string `json:"opponentName"`
+}
+
+type GameSummary struct {
+	GameId          int       `json:"gameId"`
+	TeamId          int       `json:"teamId"`
+	GameDateTime    time.Time `json:"gameDateTime"`
+	IsActive        bool      `json:"isActive"`
+	GameCountry     string    `json:"gameCountry"`
+	GameProvince    string    `json:"gameProvince"`
+	GameCity        string    `json:"gameCity"`
+	Opponent        string    `json:"gameOpponent"`
+	TeamSets        int       `json:"teamSets"`
+	OpponentSets    int       `json:"opponentSets"`
+	AttackPoints    int       `json:"attackPoints"`
+	OpponentAttacks int       `json:"opponentAttacks"`
+	BlockPoints     int       `json:"blockPoints"`
+	OpponentBlocks  int       `json:"opponentBlocks"`
+	ServePoints     int       `json:"servePoints"`
+	OpponentServes  int       `json:"opponentServes"`
+	TotalErrors     int       `json:"totalErrors"`
+	OpponentErrors  int       `json:"opponentErrors"`
+	AttackErrors    int       `json:"attackErrors"`
+	ServeErrors     int       `json:"serveErrors"`
+	TotalPoints     int       `json:"totalPoints"`
+	OpponentPoints  int       `json:"opponentPoints"`
+	GameWinner      string    `json:"gameWinner"`
+	LastUpdateDate  time.Time `json:"lastUpdateDate"`
+}
+
 type Game struct {
 	GameId              int       `json:"gameId"`
 	TeamId              int       `json:"teamId"`
@@ -41,42 +86,4 @@ type Game struct {
 	OpponentPoints      int       `json:"opponentPoints"`
 	Winner              string    `json:"gameWinner"`
 	LastUpdateDate      time.Time `json:"lastUpdateDate"`
-}
-
-type GameMainInfo struct {
-	TeamId         int       `json:"teamId"`
-	GameDate       time.Time `json:"gameDateTime"`
-	IsActive       bool      `json:"isActive"`
-	GameCountry    string    `json:"gameCountry"`
-	GameProvince   string    `json:"gameProvince"`
-	GameCity       string    `json:"gameCity"`
-	Opponent       string    `json:"opponent"`
-	LastUpdateDate time.Time `json:"lastUpdateDate"`
-}
-
-type GameSummary struct {
-	GameId          int       `json:"gameId"`
-	TeamId          int       `json:"teamId"`
-	GameDateTime    time.Time `json:"gameDateTime"`
-	IsActive        bool      `json:"isActive"`
-	GameCountry     string    `json:"gameCountry"`
-	GameProvince    string    `json:"gameProvince"`
-	GameCity        string    `json:"gameCity"`
-	Opponent        string    `json:"gameOpponent"`
-	TeamSets        int       `json:"teamSets"`
-	OpponentSets    int       `json:"opponentSets"`
-	AttackPoints    int       `json:"attackPoints"`
-	OpponentAttacks int       `json:"opponentAttacks"`
-	BlockPoints     int       `json:"blockPoints"`
-	OpponentBlocks  int       `json:"opponentBlocks"`
-	ServePoints     int       `json:"servePoints"`
-	OpponentServes  int       `json:"opponentServes"`
-	TotalErrors     int       `json:"totalErrors"`
-	OpponentErrors  int       `json:"opponentErrors"`
-	AttackErrors    int       `json:"attackErrors"`
-	ServeErrors     int       `json:"serveErrors"`
-	TotalPoints     int       `json:"totalPoints"`
-	OpponentPoints  int       `json:"opponentPoints"`
-	Winner          string    `json:"gameWinner"`
-	LastUpdateDate  time.Time `json:"lastUpdateDate"`
 }

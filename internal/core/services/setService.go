@@ -10,14 +10,19 @@ import (
 )
 
 type SetService struct {
-	setRepository ports.SetRepository
+	setRepository  ports.SetRepository
+	gameRepository ports.GameRepository
 }
 
 var _ ports.SetService = (*SetService)(nil)
 
-func NewSetService(repository ports.SetRepository) *SetService {
+func NewSetService(
+	repository ports.SetRepository,
+	gameRepository ports.GameRepository,
+) *SetService {
 	return &SetService{
-		setRepository: repository,
+		setRepository:  repository,
+		gameRepository: gameRepository,
 	}
 }
 
@@ -37,18 +42,28 @@ func (s *SetService) CreateSet(newSet domain.SetMainInfo) (int, error) {
 }
 
 func (s *SetService) FinishSet(setId int) (int, error) {
-	// TODO get set fields required to set winner
-	loc, _ := time.LoadLocation("America/Bogota")
-	set := domain.SetMainInfo{
-		LastUpdate: time.Now().In(loc),
-		IsActive:   false,
+	fail := func(err error) (int, error) {
+		return 0, fmt.Errorf("[SET SERVICE] Error in finish set: %s", err)
 	}
+	set, err := s.setRepository.GetSet(setId)
+	if err != nil {
+		return fail(err)
+	}
+	gameTeamNames, err := s.gameRepository.GetTeamsNames(set.GameId)
+	if err != nil {
+		return fail(err)
+	}
+	if set.TotalPoints > set.OpponentPoints {
+		set.SetWinner = gameTeamNames.TeamName
+	} else if set.TotalPoints < set.OpponentPoints {
+		set.SetWinner = gameTeamNames.OpponentName
+	}
+	loc, _ := time.LoadLocation("America/Bogota")
+	set.LastUpdate = time.Now().In(loc)
+	set.IsActive = false
 	rowsAffected, err := s.setRepository.FinishSet(setId, set)
 	if err != nil {
-		errorMsg := fmt.Sprintf(
-			"[SET SERVICE] Error in finish set: %s", err,
-		)
-		return 0, fmt.Errorf(errorMsg)
+		return fail(err)
 	}
 	// TODO call gameService.PlayGame
 	return rowsAffected, nil

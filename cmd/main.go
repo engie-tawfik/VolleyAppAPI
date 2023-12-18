@@ -90,7 +90,7 @@ func main() {
 	gameController.InitGameRoutes()
 
 	setRepository := repositories.NewSetRepository(db)
-	setService := services.NewSetService(setRepository)
+	setService := services.NewSetService(setRepository, gameRepository)
 	setController := controllers.NewSetController(
 		instance,
 		setService,

@@ -11,10 +11,16 @@ import (
 )
 
 type SetMainInfo struct {
-	GameId     int       `json:"gameId"`
-	StartedAt  time.Time `json:"startedAt"`
-	IsActive   bool      `json:"isActive"`
-	LastUpdate time.Time `json:"lastUpdate"`
+	GameId         int       `json:"gameId"`
+	StartedAt      time.Time `json:"startedAt"`
+	IsActive       bool      `json:"isActive"`
+	TotalPoints    int       `json:"totalPoints"`
+	OpponentPoints int       `json:"opponentPoints"`
+	SetWinner      string    `json:"setWinner"`
+	LastUpdate     time.Time `json:"lastUpdate"`
+	GameOpponent   string    `json:"gameOpponent"`
+	TeamId         int       `json:"teamId"`
+	TeamName       string    `json:"teamName"`
 }
 
 type SetSummary struct {

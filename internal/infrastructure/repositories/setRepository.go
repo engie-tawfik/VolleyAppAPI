@@ -43,16 +43,20 @@ func (s *SetRepository) SaveNewSet(newSet domain.SetMainInfo) (int, error) {
 	return int(newSetId), nil
 }
 
-func (s *SetRepository) FinishSet(setId int, set domain.SetMainInfo) (int, error) {
+func (s *SetRepository) FinishSet(setId int, set domain.Set) (int, error) {
 	// TODO check and set winner
 	query := `
 		UPDATE set
-		SET is_active = $1, last_update = $2
-		WHERE set_id = $3
+		SET
+			is_active = $1,
+			set_winner = $2,
+			last_update = $3
+		WHERE set_id = $4
 	`
 	result, err := s.db.GetDB().Exec(
 		query,
 		set.IsActive,
+		set.SetWinner,
 		set.LastUpdate,
 		setId,
 	)
