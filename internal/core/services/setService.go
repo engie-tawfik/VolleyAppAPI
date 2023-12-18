@@ -79,7 +79,9 @@ func (s *SetService) PlaySet(rally domain.Rally) (int, error) {
 		return fail(err)
 	}
 	logger.Logger.Debug(fmt.Sprintf("[SET SERVICE] Set from db: %v", set))
-
+	if !set.IsActive {
+		return fail(fmt.Errorf("set is not active"))
+	}
 	if rally.Action == constants.RollBack {
 		if len(set.GameActions) > 0 {
 			forward = false
