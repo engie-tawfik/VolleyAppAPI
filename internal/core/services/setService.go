@@ -12,6 +12,7 @@ import (
 type SetService struct {
 	setRepository  ports.SetRepository
 	gameRepository ports.GameRepository
+	gameService    ports.GameService
 }
 
 var _ ports.SetService = (*SetService)(nil)
@@ -19,10 +20,12 @@ var _ ports.SetService = (*SetService)(nil)
 func NewSetService(
 	repository ports.SetRepository,
 	gameRepository ports.GameRepository,
+	gameService ports.GameService,
 ) *SetService {
 	return &SetService{
 		setRepository:  repository,
 		gameRepository: gameRepository,
+		gameService:    gameService,
 	}
 }
 
@@ -65,7 +68,6 @@ func (s *SetService) FinishSet(setId int) (int, error) {
 	if err != nil {
 		return fail(err)
 	}
-	// TODO call gameService.PlayGame
 	return rowsAffected, nil
 }
 
@@ -129,14 +131,13 @@ func (s *SetService) PlaySet(rally domain.Rally) (int, error) {
 	loc, _ := time.LoadLocation("America/Bogota")
 	set.LastUpdate = time.Now().In(loc)
 	logger.Logger.Debug(fmt.Sprintf("[SET SERVICE] Set to be saved: %v", set))
-	fmt.Println("SET AFTER SERVICE ----", set)
-	rowsAffected, err := s.setRepository.SaveRally(set)
-	// TODO update game and team stats
+	_, err = s.setRepository.SaveSet(set)
 	if err != nil {
-		errorMsg := fmt.Sprintf(
-			"[SET SERVICE] Error in play set: %s", err,
-		)
-		return 0, fmt.Errorf(errorMsg)
+		return fail(err)
+	}
+	rowsAffected, err := s.gameService.UpdateGameStats(set)
+	if err != nil {
+		return fail(err)
 	}
 	return rowsAffected, nil
 }

@@ -109,7 +109,7 @@ func (s *SetRepository) GetSet(setId int) (domain.Set, error) {
 		&set.OpponentAttacks,
 		&set.OpponentBlocks,
 		&set.OpponentServes,
-		&set.Errors,
+		&set.TotalErrors,
 		&set.OpponentPoints,
 		&set.SetWinner,
 		pq.Array(&set.GameActions),
@@ -121,7 +121,7 @@ func (s *SetRepository) GetSet(setId int) (domain.Set, error) {
 	return set, nil
 }
 
-func (s *SetRepository) SaveRally(set domain.Set) (int, error) {
+func (s *SetRepository) SaveSet(set domain.Set) (int, error) {
 	query := `
 		UPDATE set
 		SET
@@ -147,7 +147,7 @@ func (s *SetRepository) SaveRally(set domain.Set) (int, error) {
 			opponent_attacks = $20,
 			opponent_blocks = $21,
 			opponent_serves = $22,
-			errors = $23,
+			total_errors = $23,
 			opponent_points = $24,
 			game_actions = $25,
 			last_update = $26
@@ -177,7 +177,7 @@ func (s *SetRepository) SaveRally(set domain.Set) (int, error) {
 		set.OpponentAttacks,
 		set.OpponentBlocks,
 		set.OpponentServes,
-		set.Errors,
+		set.TotalErrors,
 		set.OpponentPoints,
 		fmt.Sprintf("{%s}", strings.Join(set.GameActions, ",")),
 		set.LastUpdate,
@@ -185,7 +185,7 @@ func (s *SetRepository) SaveRally(set domain.Set) (int, error) {
 	)
 	if err != nil {
 		return 0, fmt.Errorf(
-			"[DATABASE] Error in save rally: %s", err,
+			"[DATABASE] Error in save set: %s", err,
 		)
 	}
 	rowsAffected, err := result.RowsAffected()

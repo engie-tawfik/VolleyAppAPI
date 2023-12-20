@@ -76,7 +76,7 @@ type Set struct {
 	OpponentAttacks     int       `json:"opponentAttacks"`
 	OpponentBlocks      int       `json:"opponentBlocks"`
 	OpponentServes      int       `json:"opponentServes"`
-	Errors              int       `json:"errors"`
+	TotalErrors         int       `json:"errors"`
 	OpponentPoints      int       `json:"opponentPoints"`
 	SetWinner           string    `json:"setWinner"`
 	GameActions         []string  `json:"gameActions"`
@@ -234,10 +234,10 @@ func (s *Set) OpponentError(fwd bool) {
 
 func (s *Set) Error(fwd bool) {
 	if fwd {
-		s.Errors += 1
+		s.TotalErrors += 1
 		s.OpponentPoints += 1
 	} else {
-		s.Errors -= 1
+		s.TotalErrors -= 1
 		s.OpponentPoints -= 1
 	}
 }
@@ -260,7 +260,7 @@ func (s *Set) UpdateStats() {
 	if math.IsNaN(s.ServeEffectiveness) {
 		s.ServeEffectiveness = 0.00
 	}
-	s.TotalActions = s.TotalAttacks + s.TotalBlocks + s.TotalServes + s.Errors
+	s.TotalActions = s.TotalAttacks + s.TotalBlocks + s.TotalServes + s.TotalErrors
 	s.TotalEffectiveness = (float64(s.TotalPoints-s.OpponentErrors) / float64(s.TotalActions)) * 100
 	if math.IsNaN(s.TotalEffectiveness) {
 		s.TotalEffectiveness = 0.00

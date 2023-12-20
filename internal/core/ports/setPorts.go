@@ -10,7 +10,7 @@ type SetRepository interface {
 	SaveNewSet(domain.SetMainInfo) (int, error)
 	FinishSet(int, domain.Set) (int, error)
 	GetSet(int) (domain.Set, error)
-	SaveRally(domain.Set) (int, error)
+	SaveSet(domain.Set) (int, error)
 }
 
 type SetService interface {

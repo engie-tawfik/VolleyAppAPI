@@ -6,7 +6,7 @@ import (
 
 type GameMainInfo struct {
 	TeamId         int       `json:"teamId"`
-	GameDate       time.Time `json:"gameDateTime"`
+	GameDate       time.Time `json:"gameDate"`
 	IsActive       bool      `json:"isActive"`
 	GameCountry    string    `json:"gameCountry"`
 	GameProvince   string    `json:"gameProvince"`
@@ -25,7 +25,7 @@ type GameTeamsNames struct {
 type GameSummary struct {
 	GameId          int       `json:"gameId"`
 	TeamId          int       `json:"teamId"`
-	GameDateTime    time.Time `json:"gameDateTime"`
+	GameDate        time.Time `json:"gameDate"`
 	IsActive        bool      `json:"isActive"`
 	GameCountry     string    `json:"gameCountry"`
 	GameProvince    string    `json:"gameProvince"`
@@ -52,7 +52,7 @@ type GameSummary struct {
 type Game struct {
 	GameId              int       `json:"gameId"`
 	TeamId              int       `json:"teamId"`
-	GameDate            time.Time `json:"gameDateTime"`
+	GameDate            time.Time `json:"gameDate"`
 	IsActive            bool      `json:"isActive"`
 	GameCountry         string    `json:"gameCountry"`
 	GameProvince        string    `json:"gameProvince"`
@@ -84,6 +84,6 @@ type Game struct {
 	OpponentServes      int       `json:"opponentServes"`
 	TotalErrors         int       `json:"totalErrors"`
 	OpponentPoints      int       `json:"opponentPoints"`
-	Winner              string    `json:"gameWinner"`
+	GameWinner          string    `json:"gameWinner"`
 	LastUpdateDate      time.Time `json:"lastUpdateDate"`
 }
