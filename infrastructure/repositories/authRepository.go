@@ -17,7 +17,11 @@ func NewAuthRepository() *AuthRepository {
 
 func (a *AuthRepository) GetUserByEmail(email string) (models.User, error) {
 	var user models.User
-	query := "SELECT * FROM users WHERE user_email = $1"
+	query := `
+		SELECT *
+		FROM users
+		WHERE user_email = $1
+	`
 	result := config.DB.QueryRow(
 		query,
 		email,
@@ -38,7 +42,13 @@ func (a *AuthRepository) GetUserByEmail(email string) (models.User, error) {
 }
 
 func (a *AuthRepository) SaveNewUser(newUser models.User) (int, error) {
-	query := "INSERT INTO users (is_active, user_email, user_password, creation_date, last_update_date) VALUES($1, $2, $3, $4, $5) RETURNING user_id"
+	query := `
+		INSERT INTO users
+			(is_active, user_email, user_password, creation_date, last_update_date)
+		VALUES
+			($1, $2, $3, $4, $5)
+		RETURNING user_id
+	`
 	result := config.DB.QueryRow(
 		query,
 		newUser.IsActive,

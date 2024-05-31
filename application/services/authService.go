@@ -35,7 +35,9 @@ func (a *AuthService) Login(
 
 	// Verify password
 	if passOk := utils.Verify(password, user.Password); !passOk {
-		return response, fmt.Errorf("auth service - error in Login: can't hash password")
+		return response, fmt.Errorf(
+			"auth service - error in Login: can't hash password",
+		)
 	}
 
 	response, err = a.CreateTokens(user.UserId)
@@ -49,16 +51,24 @@ func (a *AuthService) Login(
 func (a *AuthService) CreateTokens(userId int) (models.AuthResponse, error) {
 	var response models.AuthResponse
 	// Create tokens
-	accessTokenLifeDuration := time.Duration(config.JwtExpireMins) * time.Minute
-	refreshTokenLifeDuration := time.Duration(config.JwtExpireMins*2) * time.Minute
-	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": userId,
-		"exp": time.Now().Add(accessTokenLifeDuration).Unix(),
-	})
-	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": userId,
-		"exp": time.Now().Add(refreshTokenLifeDuration).Unix(),
-	})
+	accessTokenLifeDuration :=
+		time.Duration(config.JwtExpireMins) * time.Minute
+	refreshTokenLifeDuration :=
+		time.Duration(config.JwtExpireMins*2) * time.Minute
+	accessToken := jwt.NewWithClaims(
+		jwt.SigningMethodHS256,
+		jwt.MapClaims{
+			"sub": userId,
+			"exp": time.Now().Add(accessTokenLifeDuration).Unix(),
+		},
+	)
+	refreshToken := jwt.NewWithClaims(
+		jwt.SigningMethodHS256,
+		jwt.MapClaims{
+			"sub": userId,
+			"exp": time.Now().Add(refreshTokenLifeDuration).Unix(),
+		},
+	)
 	accessTokenString, _ := accessToken.SignedString(config.Secret)
 	refreshTokenString, _ := refreshToken.SignedString(config.Secret)
 	log.Println("Access token:", accessTokenString)

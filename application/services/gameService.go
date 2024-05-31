@@ -48,13 +48,16 @@ func (g *GameService) FinishGame(gameId int) (int, error) {
 
 func (g *GameService) UpdateGameStats(set models.Set) (int, error) {
 	fail := func(err error) (int, error) {
-		return 0, fmt.Errorf("game service - error in UpdateGameStats: %v", err)
+		return 0, fmt.Errorf(
+			"game service - error in UpdateGameStats: %v",
+			err,
+		)
 	}
 	game, err := g.gameRepository.GetGame(set.GameId)
 	if err != nil {
 		return fail(err)
 	}
-	log.Println("Game service - game from db: %v", game)
+	log.Println("Game service - game from db:", game)
 	if !game.IsActive {
 		return fail(fmt.Errorf("game is not active"))
 	}
@@ -77,28 +80,32 @@ func (g *GameService) UpdateGameStats(set models.Set) (int, error) {
 	game.TotalErrors += set.TotalErrors
 	game.OpponentPoints += set.OpponentPoints
 	game.TotalActions += set.TotalActions
-	game.AttackEffectiveness = (float64(game.AttackPoints) / float64(game.TotalAttacks)) * 100
+	game.AttackEffectiveness =
+		(float64(game.AttackPoints) / float64(game.TotalAttacks)) * 100
 	if math.IsNaN(game.AttackEffectiveness) {
 		game.AttackEffectiveness = 0.00
 	}
 	game.TotalBlocks = game.BlockPoints + game.BlockNeutrals + game.BlockErrors
-	game.BlockEffectiveness = (float64(game.BlockPoints) / float64(game.TotalBlocks)) * 100
+	game.BlockEffectiveness =
+		(float64(game.BlockPoints) / float64(game.TotalBlocks)) * 100
 	if math.IsNaN(game.BlockEffectiveness) {
 		game.BlockEffectiveness = 0.00
 	}
 	game.TotalServes = game.ServePoints + game.ServeNeutrals + game.ServeErrors
-	game.ServeEffectiveness = (float64(game.ServePoints) / float64(game.TotalServes)) * 100
+	game.ServeEffectiveness =
+		(float64(game.ServePoints) / float64(game.TotalServes)) * 100
 	if math.IsNaN(game.ServeEffectiveness) {
 		game.ServeEffectiveness = 0.00
 	}
-	game.TotalEffectiveness = (float64(game.TotalPoints-game.OpponentErrors) / float64(game.TotalActions)) * 100
+	game.TotalEffectiveness =
+		(float64(game.TotalPoints-game.OpponentErrors) / float64(game.TotalActions)) * 100
 	if math.IsNaN(game.TotalEffectiveness) {
 		game.TotalEffectiveness = 0.00
 	}
 
 	loc, _ := time.LoadLocation("America/Bogota")
 	game.LastUpdateDate = time.Now().In(loc)
-	log.Println("Game service - game to be saved: %v", game)
+	log.Println("Game service - game to be saved", game)
 	rowsAffected, err := g.gameRepository.SaveGame(game)
 	if err != nil {
 		return fail(err)

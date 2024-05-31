@@ -20,7 +20,13 @@ func (t *TeamRepository) CheckTeamExistence(email string) (bool, error) {
 }
 
 func (t *TeamRepository) SaveNewTeam(newTeam models.TeamMainInfo) (int, error) {
-	query := "INSERT INTO team (user_id, team_name, team_country, team_province, team_city, team_category, creation_date, last_update_date) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING team_id"
+	query := `
+		INSERT INTO team
+			(user_id, team_name, team_country, team_province, team_city, team_category, creation_date, last_update_date)
+		VALUES
+			($1, $2, $3, $4, $5, $6, $7, $8)
+		RETURNING team_id
+	`
 	result := config.DB.QueryRow(
 		query,
 		newTeam.UserId,
@@ -41,12 +47,22 @@ func (t *TeamRepository) SaveNewTeam(newTeam models.TeamMainInfo) (int, error) {
 	return int(newTeamId), nil
 }
 
-func (t *TeamRepository) GetUserTeams(userId int) ([]models.TeamSummary, error) {
+func (t *TeamRepository) GetUserTeams(
+	userId int,
+) ([]models.TeamSummary, error) {
 	var teams []models.TeamSummary
-	query := "SELECT team_id, user_id, team_name, team_country, team_province, team_city, team_category, creation_date, last_update_date, total_games, won_games, total_sets, won_sets, attack_effectiveness, block_effectiveness, serve_effectiveness, total_effectiveness FROM team WHERE user_id = $1"
+	query := `
+		SELECT
+			team_id, user_id, team_name, team_country, team_province, team_city, team_category, creation_date, last_update_date, total_games, won_games, total_sets, won_sets, attack_effectiveness, block_effectiveness, serve_effectiveness, total_effectiveness
+			FROM team
+			WHERE user_id = $1
+		`
 	result, err := config.DB.Query(query, userId)
 	if err != nil {
-		return []models.TeamSummary{}, fmt.Errorf("database - error in GetUserTeams: %v", err)
+		return []models.TeamSummary{}, fmt.Errorf(
+			"database - error in GetUserTeams: %v",
+			err,
+		)
 	}
 	defer result.Close()
 	for result.Next() {
@@ -70,12 +86,18 @@ func (t *TeamRepository) GetUserTeams(userId int) ([]models.TeamSummary, error) 
 			&team.ServeEffectiveness,
 			&team.TotalEffectiveness,
 		); err != nil {
-			return []models.TeamSummary{}, fmt.Errorf("database - error in GetUSerTeams: %v", err)
+			return []models.TeamSummary{}, fmt.Errorf(
+				"database - error in GetUSerTeams: %v",
+				err,
+			)
 		}
 		teams = append(teams, team)
 	}
 	if err := result.Err(); err != nil {
-		return []models.TeamSummary{}, fmt.Errorf("database - error in get user teams: %v", err)
+		return []models.TeamSummary{}, fmt.Errorf(
+			"database - error in get user teams: %v",
+			err,
+		)
 	}
 	return teams, nil
 }
@@ -85,6 +107,8 @@ func (t *TeamRepository) GetTeam(teamId string) (models.Team, error) {
 	return team, nil
 }
 
-func (t *TeamRepository) UpdateTeamInfo(team models.TeamMainInfo) (bool, error) {
+func (t *TeamRepository) UpdateTeamInfo(
+	team models.TeamMainInfo,
+) (bool, error) {
 	return true, nil
 }

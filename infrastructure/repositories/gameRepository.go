@@ -15,7 +15,9 @@ func NewGameRepository() *GameRepository {
 	return &GameRepository{}
 }
 
-func (g *GameRepository) SaveNewGame(newGame models.GameMainInfo) (int, error) {
+func (g *GameRepository) SaveNewGame(
+	newGame models.GameMainInfo,
+) (int, error) {
 	query := `
 		INSERT INTO game (
 			team_id,

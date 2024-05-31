@@ -246,22 +246,27 @@ func (s *Set) UpdateStats() {
 	// When doing rollback until set starting point (all stats in 0) effectiveness values are NaN
 	// Ifs in this method fix it
 	s.TotalAttacks = s.AttackPoints + s.AttackNeutrals + s.AttackErrors
-	s.AttackEffectiveness = (float64(s.AttackPoints) / float64(s.TotalAttacks)) * 100
+	s.AttackEffectiveness =
+		(float64(s.AttackPoints) / float64(s.TotalAttacks)) * 100
 	if math.IsNaN(s.AttackEffectiveness) {
 		s.AttackEffectiveness = 0.00
 	}
 	s.TotalBlocks = s.BlockPoints + s.BlockNeutrals + s.BlockErrors
-	s.BlockEffectiveness = (float64(s.BlockPoints) / float64(s.TotalBlocks)) * 100
+	s.BlockEffectiveness =
+		(float64(s.BlockPoints) / float64(s.TotalBlocks)) * 100
 	if math.IsNaN(s.BlockEffectiveness) {
 		s.BlockEffectiveness = 0.00
 	}
 	s.TotalServes = s.ServePoints + s.ServeNeutrals + s.ServeErrors
-	s.ServeEffectiveness = (float64(s.ServePoints) / float64(s.TotalServes)) * 100
+	s.ServeEffectiveness =
+		(float64(s.ServePoints) / float64(s.TotalServes)) * 100
 	if math.IsNaN(s.ServeEffectiveness) {
 		s.ServeEffectiveness = 0.00
 	}
-	s.TotalActions = s.TotalAttacks + s.TotalBlocks + s.TotalServes + s.TotalErrors
-	s.TotalEffectiveness = (float64(s.TotalPoints-s.OpponentErrors) / float64(s.TotalActions)) * 100
+	s.TotalActions =
+		s.TotalAttacks + s.TotalBlocks + s.TotalServes + s.TotalErrors
+	s.TotalEffectiveness =
+		(float64(s.TotalPoints-s.OpponentErrors) / float64(s.TotalActions)) * 100
 	if math.IsNaN(s.TotalEffectiveness) {
 		s.TotalEffectiveness = 0.00
 	}

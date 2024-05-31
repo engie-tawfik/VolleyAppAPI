@@ -34,7 +34,10 @@ func (t *TeamService) CreateTeam(newTeam models.TeamMainInfo) (int, error) {
 func (t *TeamService) GetUserTeams(userId int) ([]models.TeamSummary, error) {
 	userTeams, err := t.teamRepository.GetUserTeams(userId)
 	if err != nil {
-		return []models.TeamSummary{}, fmt.Errorf("team service error in GetUserTeams: %v", err)
+		return []models.TeamSummary{}, fmt.Errorf(
+			"team service error in GetUserTeams: %v",
+			err,
+		)
 	}
 	return userTeams, nil
 }

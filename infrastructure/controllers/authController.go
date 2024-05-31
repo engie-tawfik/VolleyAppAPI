@@ -129,7 +129,10 @@ func (a *AuthController) CreateUser(c *gin.Context) {
 	userId, err := a.authService.CreateUser(newUser)
 	if err != nil {
 		log.Println("Auth controller - error in CreateUser:", err)
-		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
+		c.AbortWithStatusJSON(
+			http.StatusInternalServerError,
+			errors.InternalServerErrorResponse,
+		)
 		return
 	}
 	log.Println("Auth controller - user created with id:", userId)

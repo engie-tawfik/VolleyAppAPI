@@ -20,8 +20,10 @@ func NewSetRepository() *SetRepository {
 
 func (s *SetRepository) SaveNewSet(newSet models.SetMainInfo) (int, error) {
 	query := `
-		INSERT INTO set (game_id, started_at, is_active, last_update)
-		VALUES($1, $2, $3, $4)
+		INSERT INTO set
+			(game_id, started_at, is_active, last_update)
+		VALUES
+			($1, $2, $3, $4)
 		RETURNING set_id
 	`
 	result := config.DB.QueryRow(

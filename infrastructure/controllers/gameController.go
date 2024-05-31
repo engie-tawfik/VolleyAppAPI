@@ -83,7 +83,12 @@ func (g *GameController) FinishGame(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
-	log.Println("Game controller - game was finished with id:", gameId, "- rows affected:", rowsAffected)
+	log.Println(
+		"Game controller - game was finished with id:",
+		gameId,
+		"- rows affected:",
+		rowsAffected,
+	)
 	response := models.Response{
 		Message: "Game successfully finished",
 		Data:    nil,

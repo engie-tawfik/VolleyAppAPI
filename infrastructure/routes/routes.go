@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"log"
 	"volleyapp/application/services"
 	"volleyapp/config"
 	"volleyapp/infrastructure/controllers"
@@ -10,7 +9,6 @@ import (
 )
 
 func InitRoutes() {
-
 	authMiddleware := middlewares.NewAuthMiddleware()
 	headersMiddleware := middlewares.NewHeadersMiddleware()
 
@@ -57,6 +55,4 @@ func InitRoutes() {
 		headersMiddleware,
 	)
 	setController.InitSetRoutes()
-	log.Println("Routes created")
-
 }

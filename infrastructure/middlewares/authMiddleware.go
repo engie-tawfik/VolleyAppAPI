@@ -26,7 +26,10 @@ func (a *AuthMiddleware) RequireAuth(c *gin.Context) {
 	tokenString, err := c.Cookie("Access")
 	if err != nil {
 		log.Println("Auth middleware - error getting access cookie:", err)
-		c.AbortWithStatusJSON(http.StatusUnauthorized, errors.UnauthorizedResponse)
+		c.AbortWithStatusJSON(
+			http.StatusUnauthorized,
+			errors.UnauthorizedResponse,
+		)
 		return
 	}
 
@@ -45,7 +48,10 @@ func (a *AuthMiddleware) RequireAuth(c *gin.Context) {
 		})
 	if err != nil {
 		log.Println("Auth middleware - error parsing token:", err)
-		c.AbortWithStatusJSON(http.StatusUnauthorized, errors.UnauthorizedResponse)
+		c.AbortWithStatusJSON(
+			http.StatusUnauthorized,
+			errors.UnauthorizedResponse,
+		)
 		return
 	}
 
@@ -55,7 +61,10 @@ func (a *AuthMiddleware) RequireAuth(c *gin.Context) {
 		c.Set("userId", claims["sub"])
 	} else {
 		log.Println("Auth middleware - invalid token")
-		c.AbortWithStatusJSON(http.StatusUnauthorized, errors.UnauthorizedResponse)
+		c.AbortWithStatusJSON(
+			http.StatusUnauthorized,
+			errors.UnauthorizedResponse,
+		)
 		return
 	}
 	c.Next()
@@ -66,25 +75,34 @@ func (a *AuthMiddleware) RequireRefresh(c *gin.Context) {
 	tokenString, err := c.Cookie("Refresh")
 	if err != nil {
 		log.Println("Auth middleware - error getting refresh cookie:", err)
-		c.AbortWithStatusJSON(http.StatusUnauthorized, errors.UnauthorizedResponse)
+		c.AbortWithStatusJSON(
+			http.StatusUnauthorized,
+			errors.UnauthorizedResponse,
+		)
 		return
 	}
 
 	// Decode token
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// Validate the algorithm for token is what you expect
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			err := fmt.Errorf(
-				"auth middleware - unexpected signing method: %v",
-				token.Header["alg"],
-			)
-			return nil, err
-		}
-		return config.Secret, nil
-	})
+	token, err := jwt.Parse(
+		tokenString,
+		func(token *jwt.Token) (interface{}, error) {
+			// Validate the algorithm for token is what you expect
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				err := fmt.Errorf(
+					"auth middleware - unexpected signing method: %v",
+					token.Header["alg"],
+				)
+				return nil, err
+			}
+			return config.Secret, nil
+		},
+	)
 	if err != nil {
 		log.Println("Auth middleware - error parsing token:", err)
-		c.AbortWithStatusJSON(http.StatusUnauthorized, errors.UnauthorizedResponse)
+		c.AbortWithStatusJSON(
+			http.StatusUnauthorized,
+			errors.UnauthorizedResponse,
+		)
 		return
 	}
 
@@ -94,7 +112,10 @@ func (a *AuthMiddleware) RequireRefresh(c *gin.Context) {
 		c.Set("userId", claims["sub"])
 	} else {
 		log.Println("Auth middleware - invalid token")
-		c.AbortWithStatusJSON(http.StatusUnauthorized, errors.UnauthorizedResponse)
+		c.AbortWithStatusJSON(
+			http.StatusUnauthorized,
+			errors.UnauthorizedResponse,
+		)
 		return
 	}
 	c.Next()

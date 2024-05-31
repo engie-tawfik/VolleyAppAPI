@@ -77,7 +77,7 @@ func (s *SetService) PlaySet(rally models.Rally) (int, error) {
 	if err != nil {
 		return handleError(err)
 	}
-	log.Println("Set service - set from db: %v", set)
+	log.Println("Set service - set from db:", set)
 	if !set.IsActive {
 		return handleError(fmt.Errorf("set is not active"))
 	}
@@ -127,7 +127,7 @@ func (s *SetService) PlaySet(rally models.Rally) (int, error) {
 
 	loc, _ := time.LoadLocation("America/Bogota")
 	set.LastUpdate = time.Now().In(loc)
-	log.Println("Set service - set to be saved: %v", set)
+	log.Println("Set service - set to be saved:", set)
 	_, err = s.setRepository.SaveSet(set)
 	if err != nil {
 		return handleError(err)

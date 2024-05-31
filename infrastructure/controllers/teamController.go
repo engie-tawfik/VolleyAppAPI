@@ -76,7 +76,10 @@ func (t *TeamController) CreateTeam(c *gin.Context) {
 
 func (t *TeamController) GetUserTeams(c *gin.Context) {
 	userId, _ := c.Get("userId")
-	log.Println("Team controller - GetUserTeams request - userId:", userId.(float64))
+	log.Println(
+		"Team controller - GetUserTeams request - userId:",
+		userId.(float64),
+	)
 	userTeams, err := t.teamService.GetUserTeams(int(userId.(float64)))
 	if err != nil {
 		log.Println("Team controller - error in GetUserTeams:", err)

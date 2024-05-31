@@ -85,7 +85,12 @@ func (s *SetController) FinishSet(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
-	log.Println("Set controller - set was finished with id:", setId, "- rows affected:", rowsAffected)
+	log.Println(
+		"Set controller - set was finished with id:",
+		setId,
+		"- rows affected:",
+		rowsAffected,
+	)
 	response := models.Response{
 		Message: "Set successfully finished",
 		Data:    nil,
@@ -107,7 +112,12 @@ func (s *SetController) PlaySet(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
-	log.Println("Set controller - rally was saved for set with id:", rally.SetId, "- rows affected:", rowsAffected)
+	log.Println(
+		"Set controller - rally was saved for set with id:",
+		rally.SetId,
+		"- rows affected:",
+		rowsAffected,
+	)
 	response := models.Response{
 		Message: "Rally successfully saved",
 		Data:    nil,

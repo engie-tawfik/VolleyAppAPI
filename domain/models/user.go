@@ -35,7 +35,11 @@ var PasswordCheck validator.Func = func(fl validator.FieldLevel) bool {
 		}
 	}
 	if ok {
-		if len(password) >= 12 && hasUpper && hasLower && hasNumber && !hasSpace {
+		if len(password) >= 12 &&
+			hasUpper &&
+			hasLower &&
+			hasNumber &&
+			!hasSpace {
 			return true
 		}
 	}
