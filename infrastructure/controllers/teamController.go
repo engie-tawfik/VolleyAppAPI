@@ -64,13 +64,13 @@ func (t *TeamController) CreateTeam(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
-	log.Println("Team controller - team was created with id:", teamId)
 	response := models.Response{
 		Message: fmt.Sprintf(
 			"Team %s successfully registered", newTeam.Name,
 		),
 		Data: teamId,
 	}
+	log.Println("Team controller - team created - response:", response)
 	c.JSON(http.StatusCreated, response)
 }
 
@@ -90,11 +90,11 @@ func (t *TeamController) GetUserTeams(c *gin.Context) {
 	if len(userTeams) == 0 {
 		responseMsg = "No teams found for user"
 	}
-	log.Println("Team controller - user teams:", userTeams)
 	response := models.Response{
 		Message: responseMsg,
 		Data:    map[string][]models.TeamSummary{"userTeams": userTeams},
 	}
+	log.Println("Team controller - user teams - response:", response)
 	c.JSON(http.StatusOK, response)
 }
 

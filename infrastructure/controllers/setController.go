@@ -63,11 +63,11 @@ func (s *SetController) CreateSet(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
-	log.Println("Set controller - set was created with id:", setId)
 	response := models.Response{
 		Message: "Set successfully started",
 		Data:    map[string]int{"setId": setId},
 	}
+	log.Println("Set controller - set created - response:", response)
 	c.JSON(http.StatusCreated, response)
 }
 
@@ -79,22 +79,17 @@ func (s *SetController) FinishSet(c *gin.Context) {
 		return
 	}
 	log.Println("Set controller - FinishSet request - setId:", setId)
-	rowsAffected, err := s.setService.FinishSet(int(setId))
+	affectedRows, err := s.setService.FinishSet(int(setId))
 	if err != nil {
 		log.Println("Set controller - error in FinishSet:", err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
-	log.Println(
-		"Set controller - set was finished with id:",
-		setId,
-		"- rows affected:",
-		rowsAffected,
-	)
 	response := models.Response{
 		Message: "Set successfully finished",
-		Data:    nil,
+		Data:    fmt.Sprintf("Affected rows: %d", affectedRows),
 	}
+	log.Println("Set controller - set finished - response:", response)
 	c.JSON(http.StatusCreated, response)
 }
 
@@ -106,21 +101,16 @@ func (s *SetController) PlaySet(c *gin.Context) {
 		return
 	}
 	log.Println("Set controller - PlaySet request - rally:", rally)
-	rowsAffected, err := s.setService.PlaySet(rally)
+	affectedRows, err := s.setService.PlaySet(rally)
 	if err != nil {
 		log.Println("Set controller - error in PlaySet:", err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
-	log.Println(
-		"Set controller - rally was saved for set with id:",
-		rally.SetId,
-		"- rows affected:",
-		rowsAffected,
-	)
 	response := models.Response{
 		Message: "Rally successfully saved",
-		Data:    nil,
+		Data:    fmt.Sprintf("Affected rows: %d", affectedRows),
 	}
+	log.Println("Set controller - rally saved - response:", response)
 	c.JSON(http.StatusCreated, response)
 }

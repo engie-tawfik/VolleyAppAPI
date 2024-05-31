@@ -61,11 +61,11 @@ func (g *GameController) CreateGame(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
-	log.Println("Game controller - game was created with id:")
 	response := models.Response{
 		Message: "Game successfully created",
 		Data:    map[string]int{"gameId": gameId},
 	}
+	log.Println("Game controller - game created - response:", response)
 	c.JSON(http.StatusCreated, response)
 }
 
@@ -77,21 +77,16 @@ func (g *GameController) FinishGame(c *gin.Context) {
 		return
 	}
 	log.Println("Game controller - FinishGame request - gameId:", gameId)
-	rowsAffected, err := g.gameService.FinishGame(int(gameId))
+	affectedRows, err := g.gameService.FinishGame(int(gameId))
 	if err != nil {
 		log.Println("Game controller - error in FinishGame:", err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
 		return
 	}
-	log.Println(
-		"Game controller - game was finished with id:",
-		gameId,
-		"- rows affected:",
-		rowsAffected,
-	)
 	response := models.Response{
 		Message: "Game successfully finished",
-		Data:    nil,
+		Data:    fmt.Sprintf("Affected rows: %d", affectedRows),
 	}
+	log.Println("Game controller - game finished - response:", response)
 	c.JSON(http.StatusCreated, response)
 }

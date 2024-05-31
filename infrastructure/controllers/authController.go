@@ -135,10 +135,10 @@ func (a *AuthController) CreateUser(c *gin.Context) {
 		)
 		return
 	}
-	log.Println("Auth controller - user created with id:", userId)
 	response := models.Response{
 		Message: "User was successfully created",
 		Data:    map[string]int{"userId": userId},
 	}
+	log.Println("Auth controller - user created - response:", response)
 	c.JSON(http.StatusCreated, response)
 }
