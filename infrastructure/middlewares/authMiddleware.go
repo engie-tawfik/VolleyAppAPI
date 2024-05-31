@@ -35,7 +35,8 @@ func (a *AuthMiddleware) RequireAuth(c *gin.Context) {
 
 	// Decode token
 	token, err := jwt.Parse(
-		tokenString, func(token *jwt.Token) (interface{}, error) {
+		tokenString,
+		func(token *jwt.Token) (interface{}, error) {
 			// Validate the algorithm for token is what you expect
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				err := fmt.Errorf(
@@ -45,7 +46,8 @@ func (a *AuthMiddleware) RequireAuth(c *gin.Context) {
 				return nil, err
 			}
 			return config.Secret, nil
-		})
+		},
+	)
 	if err != nil {
 		log.Println("Auth middleware - error parsing token:", err)
 		c.AbortWithStatusJSON(

@@ -32,7 +32,7 @@ func LoadConfig() {
 	Port = os.Getenv("PORT")
 
 	Algorithm = os.Getenv("ALGORITHM")
-	JwtExpireMins, _ = strconv.Atoi(os.Getenv("JWT_EXPIRE_MINUTES"))
+	JwtExpireMins, _ = strconv.Atoi(os.Getenv("JWT_TOKEN_EXPIRE_MINUTES"))
 	Secret = []byte(os.Getenv("SECRET"))
 	WebApp = os.Getenv("WEBAPP")
 	ApiKey = os.Getenv("API_KEY")
