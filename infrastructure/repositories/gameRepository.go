@@ -19,7 +19,7 @@ func (g *GameRepository) SaveNewGame(
 	newGame models.GameMainInfo,
 ) (int, error) {
 	query := `
-		INSERT INTO game (
+		INSERT INTO games (
 			team_id,
 			game_date,
 			is_active,
@@ -56,7 +56,7 @@ func (g *GameRepository) FinishGame(
 	game models.GameMainInfo,
 ) (int, error) {
 	query := `
-		UPDATE game
+		UPDATE games
 		SET
 			is_active = $1,
 			last_update_date = $2
@@ -92,8 +92,8 @@ func (g *GameRepository) GetTeamsNames(
 			g.opponent,
 			g.team_id,
 			t.team_name
-		FROM game g
-		JOIN team t
+		FROM games g
+		JOIN teams t
 		ON t.team_id = g.team_id
 		AND g.game_id = $1
 	`
@@ -117,7 +117,7 @@ func (g *GameRepository) GetGame(gameId int) (models.Game, error) {
 	var game models.Game
 	query := `
 		SELECT *
-		FROM game
+		FROM games
 		WHERE game_id = $1
 	`
 	result := config.DB.QueryRow(query, gameId)
@@ -166,7 +166,7 @@ func (g *GameRepository) GetGame(gameId int) (models.Game, error) {
 
 func (g *GameRepository) SaveGame(game models.Game) (int, error) {
 	query := `
-		UPDATE game
+		UPDATE games
 		SET
 			team_sets = $1,
 			opponent_sets = $2,

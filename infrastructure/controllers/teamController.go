@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"volleyapp/config"
 	"volleyapp/domain/models"
 	"volleyapp/domain/ports"
@@ -99,10 +100,30 @@ func (t *TeamController) GetUserTeams(c *gin.Context) {
 }
 
 func (t *TeamController) GetTeam(c *gin.Context) {
-	response := models.Response{}
+	teamId, err := strconv.Atoi(c.Query("id"))
+	if err != nil {
+		log.Println("Team controller - error in GetTeam:", err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, errors.BadRequestResponse)
+	}
+	log.Println("Team controller - GetTeam request - teamId:", teamId)
+	team, err := t.teamService.GetTeam(teamId)
+	if err != nil {
+		log.Println("Team controller - error in GetTeam:", err)
+		c.AbortWithStatusJSON(
+			http.StatusInternalServerError,
+			errors.InternalServerResponse,
+		)
+		return
+	}
+	response := models.Response{
+		Message: "Team found",
+		Data:    team,
+	}
+	log.Println("Team controller - team found - response:", response)
 	c.JSON(http.StatusOK, response)
 }
 
 func (t *TeamController) UpdateTeamInfo(c *gin.Context) {
-
+	response := models.Response{}
+	c.JSON(http.StatusOK, response)
 }

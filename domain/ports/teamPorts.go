@@ -9,14 +9,14 @@ import (
 type TeamRepository interface {
 	SaveNewTeam(models.TeamMainInfo) (int, error)
 	GetUserTeams(int) ([]models.TeamSummary, error)
-	GetTeam(string) (models.Team, error)
+	GetTeam(int) (models.Team, error)
 	CheckTeamExistence(string) (bool, error)
 }
 
 type TeamService interface {
 	CreateTeam(models.TeamMainInfo) (int, error)
 	GetUserTeams(int) ([]models.TeamSummary, error)
-	GetTeam(string) (models.Team, error)
+	GetTeam(int) (models.Team, error)
 	UpdateTeamInfo(models.TeamMainInfo) (bool, error)
 }
 

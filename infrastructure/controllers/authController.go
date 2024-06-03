@@ -131,7 +131,7 @@ func (a *AuthController) CreateUser(c *gin.Context) {
 		log.Println("Auth controller - error in CreateUser:", err)
 		c.AbortWithStatusJSON(
 			http.StatusInternalServerError,
-			errors.InternalServerErrorResponse,
+			errors.InternalServerResponse,
 		)
 		return
 	}

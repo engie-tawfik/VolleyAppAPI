@@ -20,7 +20,7 @@ func NewSetRepository() *SetRepository {
 
 func (s *SetRepository) SaveNewSet(newSet models.SetMainInfo) (int, error) {
 	query := `
-		INSERT INTO set
+		INSERT INTO sets
 			(game_id, started_at, is_active, last_update)
 		VALUES
 			($1, $2, $3, $4)
@@ -45,7 +45,7 @@ func (s *SetRepository) SaveNewSet(newSet models.SetMainInfo) (int, error) {
 func (s *SetRepository) FinishSet(setId int, set models.Set) (int, error) {
 	// TODO check and set winner
 	query := `
-		UPDATE set
+		UPDATE sets
 		SET
 			is_active = $1,
 			set_winner = $2,
@@ -77,7 +77,7 @@ func (s *SetRepository) GetSet(setId int) (models.Set, error) {
 	var set models.Set
 	query := `
 		SELECT *
-		FROM set
+		FROM sets
 		WHERE set_id = $1
 	`
 	result := config.DB.QueryRow(query, setId)
@@ -122,7 +122,7 @@ func (s *SetRepository) GetSet(setId int) (models.Set, error) {
 
 func (s *SetRepository) SaveSet(set models.Set) (int, error) {
 	query := `
-		UPDATE set
+		UPDATE sets
 		SET
 			total_attacks = $1,
 			attack_points = $2,

@@ -17,7 +17,7 @@ var UnauthorizedResponse = models.Response{
 	Data:      nil,
 }
 
-var InternalServerErrorResponse = models.Response{
+var InternalServerResponse = models.Response{
 	ErrorCode: http.StatusInternalServerError,
 	Message:   "Internal server error.",
 	Data:      nil,

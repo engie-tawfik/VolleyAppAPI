@@ -59,8 +59,9 @@ func (a *AuthMiddleware) RequireAuth(c *gin.Context) {
 
 	// Get token data
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		// Attach teamId to request
+		// Attach userId to request
 		c.Set("userId", claims["sub"])
+		log.Println("Auth middleware - access - userId:", claims["sub"])
 	} else {
 		log.Println("Auth middleware - invalid token")
 		c.AbortWithStatusJSON(
@@ -110,8 +111,9 @@ func (a *AuthMiddleware) RequireRefresh(c *gin.Context) {
 
 	// Get token data
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		// Attach teamId to request
+		// Attach userId to request
 		c.Set("userId", claims["sub"])
+		log.Println("Auth middleware - refresh - userId:", claims["sub"])
 	} else {
 		log.Println("Auth middleware - invalid token")
 		c.AbortWithStatusJSON(
